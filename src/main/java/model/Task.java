@@ -66,5 +66,10 @@ public class Task {
 	public void setMemo(String memo) {
 		this.memo = memo;
 	}
+	
+	@Override
+	public String toString() {
+		return "id=" + this.id + " scheduleId=" + this.scheduleId + " startTime=" + this.startTime + " endTime=" + this.endTime + " taskName=" + this.taskName + " memo=" + this.memo;
+	}
 }
 

@@ -56,4 +56,9 @@ public class User {
 	public void setCreatedAt(LocalDateTime creatdAt) {
 		this.createdAt = creatdAt;
 	}
+	
+	@Override
+	public String toString() {
+		return "id=" + this.id + " name=" + this.name + " email=" + this.email + " password=" + this.password + " createdAt=" + this.createdAt;
+	}
 }

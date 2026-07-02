@@ -44,4 +44,9 @@ public class Schedule {
 	public void setTitle(String title) {
 		this.title = title;
 	}
+	
+	@Override
+	public String toString() {
+		return "id=" + this.id + " userId=" + this.userId + " dayOfWeek=" + this.dayOfWeek + "title=" + this.title;
+	}
 }

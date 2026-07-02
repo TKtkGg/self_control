@@ -1,4 +1,4 @@
-package util;
+package com.tktkgg.self_control.util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

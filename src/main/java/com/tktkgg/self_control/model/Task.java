@@ -1,4 +1,4 @@
-package model;
+package com.tktkgg.self_control.model;
 
 import java.time.LocalTime;
 

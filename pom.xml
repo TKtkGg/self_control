@@ -3,4 +3,13 @@
   <groupId>example.com</groupId>
   <artifactId>self_control</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  
+  <dependencies>
+  	<dependency>
+	    <groupId>org.postgresql</groupId>
+	    <artifactId>postgresql</artifactId>
+	    <version>42.7.7</version>
+	</dependency>
+  </dependencies>
 </project>
+

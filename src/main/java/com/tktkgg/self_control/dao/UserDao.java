@@ -13,10 +13,11 @@ public class UserDao {
 		String sql = "SELECT * FROM users WHERE email = ?";
 		
 		try (Connection con = DBConnection.getConnection();
-			PreparedStatement pstmt = con.prepareStatement(sql)) {
+			PreparedStatement pstmt = con.prepareStatement(sql);
+			ResultSet rs = pstmt.executeQuery()) {
 			
 			pstmt.setString(1, email);
-			ResultSet rs = pstmt.executeQuery();
+			
 						
 			if (rs.next()) {
 				return new User(

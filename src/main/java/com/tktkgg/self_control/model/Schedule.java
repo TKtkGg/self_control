@@ -3,10 +3,10 @@ package com.tktkgg.self_control.model;
 public class Schedule {
 	private int id;
 	private int userId;
-	private int dayOfWeek;
+	private String dayOfWeek;
 	private String title;
 	
-	public Schedule(int id, int userId, int dayOfWeek, String title) {
+	public Schedule(int id, int userId, String dayOfWeek, String title) {
 		this.id = id;
 		this.userId = userId;
 		this.dayOfWeek = dayOfWeek;
@@ -21,7 +21,7 @@ public class Schedule {
 		return this.userId;
 	}
 	
-	public int getDayOfWeek() {
+	public String getDayOfWeek() {
 		return this.dayOfWeek;
 	}
 	
@@ -37,7 +37,7 @@ public class Schedule {
 		this.userId = userId;
 	}
 	
-	public void setDayOfWeek(int dayOfWeek) {
+	public void setDayOfWeek(String dayOfWeek) {
 		this.dayOfWeek = dayOfWeek;
 	}
 	

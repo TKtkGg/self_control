@@ -17,23 +17,24 @@ public class ScheduleDao {
 		String sql = "SELECT * FROM schedules WHERE user_id = ?";
 		
 		try(Connection con = DBConnection.getConnection();
-			PreparedStatement pstmt = con.prepareStatement(sql);
-			ResultSet rs = pstmt.executeQuery()) {
+			PreparedStatement pstmt = con.prepareStatement(sql)) {
 			
 			pstmt.setInt(1, userId);
 			
-			while(rs.next()) {
-				scheduleList.add(
-					new Schedule(
-						rs.getInt("id"),
-						rs.getInt("user_id"),
-						rs.getString("day_of_week"),
-						rs.getString("title")
-					)
-				);
+			try (ResultSet rs = pstmt.executeQuery()) {
+				while(rs.next()) {
+					scheduleList.add(
+						new Schedule(
+							rs.getInt("id"),
+							rs.getInt("user_id"),
+							rs.getString("day_of_week"),
+							rs.getString("title")
+						)
+					);
+				}
+				
+				return scheduleList;
 			}
-			
-			return scheduleList;
 		}
 	}
 }

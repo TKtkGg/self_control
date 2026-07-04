@@ -13,24 +13,23 @@ public class UserDao {
 		String sql = "SELECT * FROM users WHERE email = ?";
 		
 		try (Connection con = DBConnection.getConnection();
-			PreparedStatement pstmt = con.prepareStatement(sql);
-			ResultSet rs = pstmt.executeQuery()) {
+			PreparedStatement pstmt = con.prepareStatement(sql)) {
 			
 			pstmt.setString(1, email);
 			
-						
-			if (rs.next()) {
-				return new User(
-					rs.getInt("id"),
-					rs.getString("username"),
-					rs.getString("email"),
-					rs.getString("password"),
-					rs.getTimestamp("created_at").toLocalDateTime()
-				);
+			try (ResultSet rs = pstmt.executeQuery()) {
+				if (rs.next()) {
+					return new User(
+						rs.getInt("id"),
+						rs.getString("username"),
+						rs.getString("email"),
+						rs.getString("password"),
+						rs.getTimestamp("created_at").toLocalDateTime()
+					);
+				}
+				
+				return null;
 			}
-			
-			return null;
-			
 		}	
 	}
 }

@@ -4,14 +4,14 @@ import java.time.LocalDateTime;
 
 public class User {
 	private int id;
-	private String name;
+	private String username;
 	private String email;
 	private String password;
 	private LocalDateTime createdAt;
 	
-	public User(int id, String name, String email, String password, LocalDateTime createdAt) {
+	public User(int id, String username, String email, String password, LocalDateTime createdAt) {
 		this.id = id;
-		this.name = name;
+		this.username = username;
 		this.email = email;
 		this.password = password;
 		this.createdAt = createdAt;
@@ -21,8 +21,8 @@ public class User {
 		return this.id;
 	}
 	
-	public String getName() {
-		return this.name;
+	public String getUsername() {
+		return this.username;
 	}
 	
 	public String getEmail() {
@@ -41,8 +41,8 @@ public class User {
 		this.id = id;
 	}
 	
-	public void setName(String name) {
-		this.name = name;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 	
 	public void setEmail(String email) {
@@ -59,6 +59,6 @@ public class User {
 	
 	@Override
 	public String toString() {
-		return "id=" + this.id + " name=" + this.name + " email=" + this.email + " password=" + this.password + " createdAt=" + this.createdAt;
+		return "id=" + this.id + " username=" + this.username + " email=" + this.email + " password=" + this.password + " createdAt=" + this.createdAt;
 	}
 }

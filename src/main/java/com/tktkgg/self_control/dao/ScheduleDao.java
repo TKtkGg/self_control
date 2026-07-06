@@ -11,6 +11,33 @@ import com.tktkgg.self_control.model.Schedule;
 import com.tktkgg.self_control.util.DBConnection;
 
 public class ScheduleDao {
+	public Schedule mapSchedule(ResultSet rs) throws SQLException {
+		return new Schedule(
+			rs.getInt("id"),
+			rs.getInt("user_id"),
+			rs.getString("day_of_week"),
+			rs.getString("title")
+		);
+	}
+	
+	public Schedule findById(int id) throws ClassNotFoundException, SQLException {
+		String sql = "SELECT * FROM schedules WHERE id = ?";
+		
+		try(Connection con = DBConnection.getConnection();
+			PreparedStatement pstmt = con.prepareStatement(sql)) {
+			
+			pstmt.setInt(1, id);
+			
+			try (ResultSet rs = pstmt.executeQuery()) {
+				if (rs.next()) {
+					return mapSchedule(rs);
+				}
+				
+				return null;
+			}
+		}
+	}
+	
 	public List<Schedule> findByUserId(int userId) throws ClassNotFoundException, SQLException {
 		List<Schedule> scheduleList = new ArrayList<Schedule>();
 		
@@ -24,17 +51,85 @@ public class ScheduleDao {
 			try (ResultSet rs = pstmt.executeQuery()) {
 				while(rs.next()) {
 					scheduleList.add(
-						new Schedule(
-							rs.getInt("id"),
-							rs.getInt("user_id"),
-							rs.getString("day_of_week"),
-							rs.getString("title")
-						)
+						mapSchedule(rs)
 					);
 				}
 				
 				return scheduleList;
 			}
 		}
+	}
+	
+	public List<Schedule> findAll() throws ClassNotFoundException, SQLException {
+		List<Schedule> scheduleList = new ArrayList<Schedule>();
+		
+		String sql = "SELECT * FROM schedules ORDER BY id";
+		
+		try(Connection con = DBConnection.getConnection();
+			PreparedStatement pstmt = con.prepareStatement(sql);
+			ResultSet rs = pstmt.executeQuery()) {
+					
+			while(rs.next()) {
+				scheduleList.add(
+					mapSchedule(rs)
+				);
+			}
+			
+			return scheduleList;
+			
+		}
+	}
+	
+	public void create(Schedule schedule) throws ClassNotFoundException, SQLException {
+		String sql = "INSERT INTO schedules(user_id, day_of_week, title) VALUES(?, ?, ?)";
+		
+		try (Connection con = DBConnection.getConnection();
+			PreparedStatement pstmt = con.prepareStatement(sql)) {
+			
+			pstmt.setInt(1, schedule.getUserId());
+			pstmt.setString(2, schedule.getDayOfWeek());
+			pstmt.setString(3, schedule.getTitle());
+			
+			int count = pstmt.executeUpdate();
+
+			if (count == 0) {
+			    throw new SQLException("作成できませんでした");
+			}
+		}
+	}
+
+	public void update(Schedule schedule) throws ClassNotFoundException, SQLException {
+		String sql = "UPDATE schedules SET user_id = ?, day_of_week = ?, title = ? WHERE id = ?";
+		
+		try (Connection con = DBConnection.getConnection();
+			PreparedStatement pstmt = con.prepareStatement(sql)) {
+			
+			pstmt.setInt(1, schedule.getUserId());
+			pstmt.setString(2, schedule.getDayOfWeek());
+			pstmt.setString(3, schedule.getTitle());
+			pstmt.setInt(4, schedule.getId());
+			
+			int count = pstmt.executeUpdate();
+
+			if (count == 0) {
+			    throw new SQLException("更新できませんでした");
+			}
+		}
+	}
+
+	public void delete(int id) throws ClassNotFoundException, SQLException {
+		String sql = "DELETE FROM schedules WHERE id = ?";
+		
+		try (Connection con = DBConnection.getConnection();
+			PreparedStatement pstmt = con.prepareStatement(sql)) {
+			
+			pstmt.setInt(1, id);
+			
+			int count = pstmt.executeUpdate();
+
+			if (count == 0) {
+			    throw new SQLException("削除できませんでした");
+			}
+		}	
 	}
 }

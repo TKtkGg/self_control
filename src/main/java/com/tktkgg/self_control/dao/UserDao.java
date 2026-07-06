@@ -59,11 +59,12 @@ public class UserDao {
 	
 	public List<User> findAll() throws ClassNotFoundException, SQLException {
 		List<User> userList = new ArrayList<User>();
-		String sql = "SELECT * FROM users";
+		String sql = "SELECT * FROM users ORDER BY id";
 		
 		try (Connection con = DBConnection.getConnection();
 			PreparedStatement pstmt = con.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery()) {
+			
 			while (rs.next()) {
 				userList.add(
 					mapUser(rs)

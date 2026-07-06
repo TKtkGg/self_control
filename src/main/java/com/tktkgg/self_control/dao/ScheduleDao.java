@@ -11,7 +11,7 @@ import com.tktkgg.self_control.model.Schedule;
 import com.tktkgg.self_control.util.DBConnection;
 
 public class ScheduleDao {
-	public Schedule mapSchedule(ResultSet rs) throws SQLException {
+	private Schedule mapSchedule(ResultSet rs) throws SQLException {
 		return new Schedule(
 			rs.getInt("id"),
 			rs.getInt("user_id"),

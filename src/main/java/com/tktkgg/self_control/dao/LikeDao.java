@@ -11,6 +11,14 @@ import com.tktkgg.self_control.model.Like;
 import com.tktkgg.self_control.util.DBConnection;
 
 public class LikeDao {
+	private Like mapLike(ResultSet rs) throws SQLException {
+		return new Like(
+			rs.getInt("id"),
+			rs.getInt("user_id"),
+			rs.getInt("schedule_id")	
+		);
+	}
+	
 	public List<Like> findByScheduleId(int scheduleId) throws  ClassNotFoundException, SQLException {
 		List<Like> likeList = new ArrayList<Like>();
 		
@@ -24,16 +32,30 @@ public class LikeDao {
 			try (ResultSet rs = pstmt.executeQuery()) {
 				while(rs.next()) {
 					likeList.add(
-						new Like(
-							rs.getInt("id"),
-							rs.getInt("user_id"),
-							rs.getInt("schedule_id")
-							
-						)
+						mapLike(rs)
 					);
 				}
 				
 				return likeList;
+			}
+		}
+	}
+	
+	public boolean exists(int userId, int scheduleId) throws ClassNotFoundException, SQLException {
+		String sql = "SELECT EXISTS(SELECT 1 FROM likes WHERE user_id = ? AND schedule_id = ?) AS liked";
+		
+		try(Connection con = DBConnection.getConnection();
+			PreparedStatement pstmt = con.prepareStatement(sql)) {
+			
+			pstmt.setInt(1, userId);
+			pstmt.setInt(2, scheduleId);
+			
+			try (ResultSet rs = pstmt.executeQuery()) {
+				if (rs.next()) {
+					return rs.getBoolean("liked");
+				}
+				
+				return false;
 			}
 		}
 	}
@@ -56,5 +78,39 @@ public class LikeDao {
 				return likeCount;
 			}
 		}
+	}
+	
+	public void create(Like like) throws ClassNotFoundException, SQLException {
+		String sql = "INSERT INTO likes(user_id, schedule_id) VALUES(?, ?)";
+		
+		try (Connection con = DBConnection.getConnection();
+			PreparedStatement pstmt = con.prepareStatement(sql)) {
+			
+			pstmt.setInt(1, like.getUserId());
+			pstmt.setInt(2, like.getScheduleId());
+			
+			int count = pstmt.executeUpdate();
+
+			if (count == 0) {
+			    throw new SQLException("作成できませんでした");
+			}
+		}	
+	}
+	
+	public void delete(int userId, int scheduleId) throws ClassNotFoundException, SQLException {
+		String sql = "DELETE FROM likes WHERE user_id = ? AND schedule_id = ?";
+		
+		try (Connection con = DBConnection.getConnection();
+			PreparedStatement pstmt = con.prepareStatement(sql)) {
+			
+			pstmt.setInt(1, userId);
+			pstmt.setInt(2, scheduleId);
+			
+			int count = pstmt.executeUpdate();
+
+			if (count == 0) {
+			    throw new SQLException("削除できませんでした");
+			}
+		}	
 	}
 }

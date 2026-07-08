@@ -60,6 +60,29 @@ public class ScheduleDao {
 		}
 	}
 	
+	public List<Schedule> findByUserIdAndDayOfWeek(int userId, String dayOfWeek) throws ClassNotFoundException, SQLException {
+		List<Schedule> scheduleList = new ArrayList<Schedule>();
+		
+		String sql = "SELECT * FROM schedules WHERE user_id = ? AND day_of_week = ?";
+		
+		try(Connection con = DBConnection.getConnection();
+			PreparedStatement pstmt = con.prepareStatement(sql)) {
+			
+			pstmt.setInt(1, userId);
+			pstmt.setString(2, dayOfWeek);
+			
+			try (ResultSet rs = pstmt.executeQuery()) {
+				while(rs.next()) {
+					scheduleList.add(
+						mapSchedule(rs)
+					);
+				}
+				
+				return scheduleList;
+			}
+		}
+	} 
+	
 	public List<Schedule> findAll() throws ClassNotFoundException, SQLException {
 		List<Schedule> scheduleList = new ArrayList<Schedule>();
 		

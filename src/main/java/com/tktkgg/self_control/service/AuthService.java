@@ -8,14 +8,14 @@ import com.tktkgg.self_control.util.SessionManager;
 
 public class AuthService {
 	UserDao ud = new UserDao();
-	SessionManager sm = new SessionManager();
+	
 	public boolean login(String email, String password) throws ClassNotFoundException, SQLException {
 		User user = ud.findByEmail(email);
 		
 		if (user == null) return false;
 		
 		if (user.getPassword().equals(password)) {
-			sm.setUser(user);
+			SessionManager.setUser(user);
 			return true;
 		} else {
 			return false;
@@ -24,11 +24,11 @@ public class AuthService {
 	
 	public void signup(User user) throws ClassNotFoundException, SQLException {
 		ud.create(user);
-		sm.setUser(user);
+		SessionManager.setUser(user);
 	}
 	
 	public void logout(User user) {
-		sm.clearUser();
+		SessionManager.clearUser();
 	}
 	
 }

@@ -12,7 +12,7 @@ import com.tktkgg.self_control.model.Schedule;
 import com.tktkgg.self_control.util.SessionManager;
 
 public class ScheduleService {
-	ScheduleDao sd = new ScheduleDao();
+	private final ScheduleDao sd = new ScheduleDao();
 	
 	private String getDayOfTheWeekShort() { 
 		LocalDate today = LocalDate.now();

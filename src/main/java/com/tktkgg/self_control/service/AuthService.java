@@ -7,7 +7,7 @@ import com.tktkgg.self_control.model.User;
 import com.tktkgg.self_control.util.SessionManager;
 
 public class AuthService {
-	UserDao ud = new UserDao();
+	private final UserDao ud = new UserDao();
 	
 	public boolean login(String email, String password) throws ClassNotFoundException, SQLException {
 		User user = ud.findByEmail(email);

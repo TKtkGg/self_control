@@ -17,6 +17,14 @@ public class User {
 		this.createdAt = createdAt;
 	}
 	
+	public User(String username, String email, String password) {
+		this.id = 0;
+		this.username = username;
+		this.email = email;
+		this.password = password;
+		this.createdAt = LocalDateTime.now();
+	}
+	
 	public int getId() {
 		return this.id;
 	}

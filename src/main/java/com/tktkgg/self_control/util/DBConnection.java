@@ -6,8 +6,8 @@ import java.sql.SQLException;
 
 public class DBConnection {
 	public static Connection getConnection() throws SQLException, ClassNotFoundException {
-		final String URL = "jdbc:postgresql://localhost:5432/self_controldb";
-		final String USER = "miyamotoyuuki";
+		final String URL = "jdbc:postgresql://localhost:5432/self_control";
+		final String USER = "self_control_user";
 		final String PASSWORD = "postgres";
 		
 		Class.forName("org.postgresql.Driver");

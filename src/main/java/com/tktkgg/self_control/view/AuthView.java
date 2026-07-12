@@ -1,19 +1,18 @@
 package com.tktkgg.self_control.view;
 
 import java.sql.SQLException;
-import java.util.Scanner;
 
 import com.tktkgg.self_control.model.User;
 import com.tktkgg.self_control.service.AuthService;
+import com.tktkgg.self_control.util.Input;
 
 public class AuthView {
-	private Scanner sc = new Scanner(System.in);
 	private AuthService as = new AuthService();
 	
-	public void homeView() throws ClassNotFoundException, SQLException {
+	public void startView() throws ClassNotFoundException, SQLException {
 		while(true) {
 			System.out.println("1.ログイン\n2.サインアップ");
-			int choice = sc.nextInt();
+			int choice = Input.nextInt();
 			
 			if (choice == 1) {
 				if (loginView()) {
@@ -37,11 +36,11 @@ public class AuthView {
 		
 		while(true) {
 			System.out.println("メールアドレス：");
-			String email = sc.next();
+			String email = Input.next();
 			if (email.equals("q")) return true;
 			
 			System.out.println("パスワード");
-			String password = sc.next();
+			String password = Input.next();
 			
 			if (as.login(email, password)) {
 				System.out.println("ログインに成功しました。");
@@ -58,14 +57,14 @@ public class AuthView {
 		
 		while(true) {
 			System.out.println("ユーザーネーム：");
-			String username = sc.next();
+			String username = Input.next();
 			if (username.equals("q")) return true;
 			
 			System.out.println("メールアドレス：");
-			String email = sc.next();
+			String email = Input.next();
 			
 			System.out.println("パスワード");
-			String password = sc.next();
+			String password = Input.next();
 			
 			User user = new User(username, email, password);
 			as.signup(user);

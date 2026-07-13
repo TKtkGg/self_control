@@ -1,12 +1,14 @@
 package com.tktkgg.self_control.model;
 
+import java.time.DayOfWeek;
+
 public class Schedule {
 	private int id;
 	private int userId;
-	private String dayOfWeek;
+	private DayOfWeek dayOfWeek;
 	private String title;
 	
-	public Schedule(int id, int userId, String dayOfWeek, String title) {
+	public Schedule(int id, int userId, DayOfWeek dayOfWeek, String title) {
 		this.id = id;
 		this.userId = userId;
 		this.dayOfWeek = dayOfWeek;
@@ -21,7 +23,7 @@ public class Schedule {
 		return this.userId;
 	}
 	
-	public String getDayOfWeek() {
+	public DayOfWeek getDayOfWeek() {
 		return this.dayOfWeek;
 	}
 	
@@ -37,7 +39,7 @@ public class Schedule {
 		this.userId = userId;
 	}
 	
-	public void setDayOfWeek(String dayOfWeek) {
+	public void setDayOfWeek(DayOfWeek dayOfWeek) {
 		this.dayOfWeek = dayOfWeek;
 	}
 	

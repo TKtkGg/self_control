@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class ScheduleDao {
 		return new Schedule(
 			rs.getInt("id"),
 			rs.getInt("user_id"),
-			rs.getString("day_of_week"),
+			DayOfWeek.of(rs.getInt("day_of_week")),
 			rs.getString("title")
 		);
 	}
@@ -60,7 +61,7 @@ public class ScheduleDao {
 		}
 	}
 	
-	public List<Schedule> findByUserIdAndDayOfWeek(int userId, String dayOfWeek) throws ClassNotFoundException, SQLException {
+	public List<Schedule> findByUserIdAndDayOfWeek(int userId, DayOfWeek dayOfWeek) throws ClassNotFoundException, SQLException {
 		List<Schedule> scheduleList = new ArrayList<Schedule>();
 		
 		String sql = "SELECT * FROM schedules WHERE user_id = ? AND day_of_week = ?";
@@ -69,7 +70,7 @@ public class ScheduleDao {
 			PreparedStatement pstmt = con.prepareStatement(sql)) {
 			
 			pstmt.setInt(1, userId);
-			pstmt.setString(2, dayOfWeek);
+			pstmt.setInt(2, dayOfWeek.getValue());
 			
 			try (ResultSet rs = pstmt.executeQuery()) {
 				while(rs.next()) {
@@ -110,7 +111,7 @@ public class ScheduleDao {
 			PreparedStatement pstmt = con.prepareStatement(sql)) {
 			
 			pstmt.setInt(1, schedule.getUserId());
-			pstmt.setString(2, schedule.getDayOfWeek());
+			pstmt.setInt(2, schedule.getDayOfWeek().getValue());
 			pstmt.setString(3, schedule.getTitle());
 			
 			int count = pstmt.executeUpdate();
@@ -128,7 +129,7 @@ public class ScheduleDao {
 			PreparedStatement pstmt = con.prepareStatement(sql)) {
 			
 			pstmt.setInt(1, schedule.getUserId());
-			pstmt.setString(2, schedule.getDayOfWeek());
+			pstmt.setInt(2, schedule.getDayOfWeek().getValue());
 			pstmt.setString(3, schedule.getTitle());
 			pstmt.setInt(4, schedule.getId());
 			

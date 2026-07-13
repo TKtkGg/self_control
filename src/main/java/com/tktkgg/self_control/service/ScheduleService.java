@@ -3,7 +3,6 @@ package com.tktkgg.self_control.service;
 import java.sql.SQLException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.List;
 
 import com.tktkgg.self_control.dao.ScheduleDao;
 import com.tktkgg.self_control.model.Schedule;
@@ -19,7 +18,7 @@ public class ScheduleService {
         return dayOfWeek;
 	}
 	
-	public List<Schedule> getTodaySchedule() throws ClassNotFoundException, SQLException {
+	public Schedule getTodaySchedule() throws ClassNotFoundException, SQLException {
 		return sd.findByUserIdAndDayOfWeek(SessionManager.getUser().getId(), getDayOfTheWeekShort());	
 	}
 	

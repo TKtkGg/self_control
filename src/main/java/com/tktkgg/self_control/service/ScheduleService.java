@@ -22,6 +22,10 @@ public class ScheduleService {
 		return sd.findByUserIdAndDayOfWeek(SessionManager.getUser().getId(), getDayOfTheWeekShort());	
 	}
 	
+	public Schedule getSpecificSchedule(DayOfWeek day) throws ClassNotFoundException, SQLException {
+		return sd.findByUserIdAndDayOfWeek(SessionManager.getUser().getId(), day);
+	}
+	
 	public Schedule getTheSchedule(int id) throws ClassNotFoundException, SQLException {
 		return sd.findById(id);
 	}

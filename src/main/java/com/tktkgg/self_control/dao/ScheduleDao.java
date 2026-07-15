@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,21 +102,29 @@ public class ScheduleDao {
 		}
 	}
 	
-	public void create(Schedule schedule) throws ClassNotFoundException, SQLException {
+	public Schedule create(Schedule schedule) throws ClassNotFoundException, SQLException {
 		String sql = "INSERT INTO schedules(user_id, day_of_week, title) VALUES(?, ?, ?)";
 		
 		try (Connection con = DBConnection.getConnection();
-			PreparedStatement pstmt = con.prepareStatement(sql)) {
+			PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 			
 			pstmt.setInt(1, schedule.getUserId());
 			pstmt.setInt(2, schedule.getDayOfWeek().getValue());
 			pstmt.setString(3, schedule.getTitle());
 			
 			int count = pstmt.executeUpdate();
-
 			if (count == 0) {
 			    throw new SQLException("作成できませんでした");
 			}
+			
+			try (ResultSet rs = pstmt.getGeneratedKeys();) {
+				if (rs.next()) {
+					schedule.setId(rs.getInt(1));
+					return schedule;
+				}
+			}
+			throw new SQLException("IDの取得に失敗しました");
+			
 		}
 	}
 

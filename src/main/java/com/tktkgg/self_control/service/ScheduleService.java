@@ -30,8 +30,8 @@ public class ScheduleService {
 		return sd.findById(id);
 	}
 	
-	public void createSchedule(Schedule schedule) throws ClassNotFoundException, SQLException {
-		sd.create(schedule);
+	public Schedule createSchedule(Schedule schedule) throws ClassNotFoundException, SQLException {
+		return sd.create(schedule);
 	}
 	
 	public void updateSchedule(Schedule schedule) throws ClassNotFoundException, SQLException {

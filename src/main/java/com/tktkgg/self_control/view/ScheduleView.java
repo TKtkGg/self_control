@@ -17,9 +17,20 @@ import com.tktkgg.self_control.util.SessionManager;
 public class ScheduleView {
 	ScheduleService ss = new ScheduleService();
 	TaskService ts = new TaskService();
-	public void checkScheduleView() throws ClassNotFoundException, SQLException {
-		Schedule schedule = ss.getTodaySchedule();
-		List<Task> tasks = ts.getTasks(schedule.getId());
+	public void checkScheduleView(boolean isToday) throws ClassNotFoundException, SQLException {
+		Schedule schedule = null;
+		List<Task> tasks = null;
+		if (isToday) {
+			schedule = ss.getTodaySchedule();
+			tasks = ts.getTasks(schedule.getId());
+		} else {
+			System.out.println("何曜日のスケジュールを確認しますか？（1:月 2:火 3:水 4:木 5:金 6:土 7:日）");
+			int i = Input.nextInt();
+			DayOfWeek day = DayOfWeek.of(i);
+			
+			schedule = ss.getSpecificSchedule(day);
+			tasks = ts.getTasks(schedule.getId());
+		}
 		
 		System.out.println();
 		
@@ -29,6 +40,7 @@ public class ScheduleView {
 			System.out.println(task.getTaskName());
 			System.out.println(task.getStartTime() + " ~ " + task.getEndTime());
 			System.out.println(task.getMemo());
+			System.out.println();
 		}
 		
 		System.out.println();

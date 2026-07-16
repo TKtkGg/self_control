@@ -14,23 +14,26 @@ public class HomeView {
 	public void homeView() throws ClassNotFoundException, SQLException {
 		while(true) {
 			System.out.println("ホーム");
-			System.out.println("1.今日のスケジュールの確認\n2.スケジュールの編集\n3.スケジュールの追加\n4.ユーザー一覧\n5.ログアウト");
+			System.out.println("1.今日のスケジュールの確認\n2.スケジュールの確認\n3.スケジュールの編集\n4.スケジュールの追加\n5.ユーザー一覧\n6.ログアウト");
 			int choice = Input.nextInt();
 			
 			switch(choice) {
 				case 1:
-					sv.checkScheduleView();
+					sv.checkScheduleView(true);
 					break;
 				case 2:
-					sv.editScheduleView();
+					sv.checkScheduleView(false);
 					break;
 				case 3:
-					sv.addScheduleView();
+					sv.editScheduleView();
 					break;
 				case 4:
-					uv.usersView();
+					sv.addScheduleView();
 					break;
 				case 5:
+					uv.usersView();
+					break;
+				case 6:
 					as.logout(SessionManager.getUser());
 					break;
 				default:

@@ -10,7 +10,18 @@ public class Input {
 	}
 	
 	public static int nextInt() {
-		return sc.nextInt();
+		int i = 0;
+		while(true) {
+			try {
+				i = sc.nextInt();
+				break;
+			} catch (Exception e) {
+				System.out.println("数字以外の値を入力しないでください。");
+				sc.next();
+			}
+		}
+		sc.nextLine();
+		return i;
 	}
 	
 	public static String nextLine() {

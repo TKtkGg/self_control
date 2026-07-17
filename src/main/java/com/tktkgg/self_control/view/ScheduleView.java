@@ -157,7 +157,7 @@ public class ScheduleView {
 			
 			task = ts.getTask(id);
 			if (task == null || task.getScheduleId() != schedule.getId()) {
-				System.out.println("存在しないidです。");
+				System.out.println("存在しないIDです。");
 				continue;
 			} else {
 				break;

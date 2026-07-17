@@ -12,57 +12,13 @@ import com.tktkgg.self_control.model.Task;
 import com.tktkgg.self_control.service.ScheduleService;
 import com.tktkgg.self_control.service.TaskService;
 import com.tktkgg.self_control.util.Input;
+import com.tktkgg.self_control.util.InputUtils;
 import com.tktkgg.self_control.util.SessionManager;
 
 public class ScheduleView {
 	ScheduleService ss = new ScheduleService();
 	TaskService ts = new TaskService();
-	
-	private int inputWeek() {
-		int i = 0;
-		while (true) {
-			i = Input.nextInt();
-			if (i < 1 || i > 7) {
-				System.out.println("1~7で入力してください。");
-				continue;
-			} else {
-				break;
-			}
-		}
-		
-		return i;
-	}
-	
-	private int inputHour() {
-		int i = 0;
-		while (true) {
-			i = Input.nextInt();
-			if (i < 0 || i > 23) {
-				System.out.println("0~23で入力してください。");
-				continue;
-			} else {
-				break;
-			}
-		}
-		
-		return i;
-	}
-	
-	private int inputMinute() {
-		int i = 0;
-		while (true) {
-			i = Input.nextInt();
-			if (i < 0 || i > 59) {
-				System.out.println("0~59で入力してください。");
-				continue;
-			} else {
-				break;
-			}
-		}
-		
-		return i;
-	}
-	
+
 	private boolean isScheduleNull(Schedule schedule) {
 		if (schedule == null) {
 			System.out.println("スケジュールが存在していません。");
@@ -102,7 +58,7 @@ public class ScheduleView {
 			tasks = ts.getTasks(schedule.getId());
 		} else {
 			System.out.println("何曜日のスケジュールを確認しますか？（1:月 2:火 3:水 4:木 5:金 6:土 7:日）");
-			int i = inputWeek();
+			int i = InputUtils.inputWeek();
 			
 			DayOfWeek day = DayOfWeek.of(i);
 			
@@ -128,7 +84,7 @@ public class ScheduleView {
 	
 	public void editScheduleView() throws ClassNotFoundException, SQLException {
 		System.out.println("何曜日を編集しますか？（1:月 2:火 3:水 4:木 5:金 6:土 7:日）");
-		int i = inputWeek();
+		int i = InputUtils.inputWeek();
 		DayOfWeek day = DayOfWeek.of(i);
 		
 		Schedule schedule = ss.getSpecificSchedule(day);
@@ -170,21 +126,21 @@ public class ScheduleView {
 		
 		System.out.println("開始時間(時間/h)：" + task.getStartTime());
 		System.out.print("(入力)→");
-		int startTimeH = inputHour();
+		int startTimeH = InputUtils.inputHour();
 		
 		System.out.println("開始時間(分/m)：" + task.getStartTime());
 		System.out.print("(入力)→");
-		int startTimeM = inputMinute();
+		int startTimeM = InputUtils.inputMinute();
 		
 		LocalTime startTime = LocalTime.of(startTimeH, startTimeM);
 		
 		System.out.println("終了時間（時間/h）：" + task.getEndTime());
 		System.out.print("(入力)→");
-		int endTimeH = inputHour();
+		int endTimeH = InputUtils.inputHour();
 		
 		System.out.println("終了時間（分/m）：" + task.getEndTime());
 		System.out.print("(入力)→");
-		int endTimeM = inputMinute();
+		int endTimeM = InputUtils.inputMinute();
 		
 		LocalTime endTime = LocalTime.of(endTimeH, endTimeM);
 		
@@ -222,7 +178,7 @@ public class ScheduleView {
 	
 	public void addScheduleView() throws ClassNotFoundException, SQLException {
 		System.out.println("何曜日に追加しますか？（1:月 2:火 3:水 4:木 5:金 6:土 7:日）");
-		int i = inputWeek();
+		int i = InputUtils.inputWeek();
 		DayOfWeek day = DayOfWeek.of(i);
 		Schedule schedule = ss.getSpecificSchedule(day);
 		String title = null;
@@ -235,18 +191,18 @@ public class ScheduleView {
 		String name = Input.nextLine();
 		
 		System.out.print("開始時間(時間/h)：");
-		int startTimeH = inputHour();
+		int startTimeH = InputUtils.inputHour();
 		
 		System.out.print("開始時間(分/m)：");
-		int startTimeM = inputMinute();
+		int startTimeM = InputUtils.inputMinute();
 		
 		LocalTime startTime = LocalTime.of(startTimeH, startTimeM);
 		
 		System.out.print("終了時間（時間/h）：");
-		int endTimeH = inputHour();
+		int endTimeH = InputUtils.inputHour();
 		
 		System.out.print("終了時間（分/m）：");
-		int endTimeM = inputMinute();
+		int endTimeM = InputUtils.inputMinute();
 		
 		LocalTime endTime = LocalTime.of(endTimeH, endTimeM);
 		

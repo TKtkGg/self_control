@@ -6,6 +6,7 @@ import java.time.LocalDate;
 
 import com.tktkgg.self_control.dao.ScheduleDao;
 import com.tktkgg.self_control.model.Schedule;
+import com.tktkgg.self_control.model.User;
 import com.tktkgg.self_control.util.SessionManager;
 
 public class ScheduleService {
@@ -24,6 +25,10 @@ public class ScheduleService {
 	
 	public Schedule getSpecificSchedule(DayOfWeek day) throws ClassNotFoundException, SQLException {
 		return sd.findByUserIdAndDayOfWeek(SessionManager.getUser().getId(), day);
+	}
+	
+	public Schedule getSpecificSchedule(User user, DayOfWeek day) throws ClassNotFoundException, SQLException {
+		return sd.findByUserIdAndDayOfWeek(user.getId(), day);
 	}
 	
 	public Schedule getTheSchedule(int id) throws ClassNotFoundException, SQLException {

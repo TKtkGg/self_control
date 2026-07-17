@@ -5,8 +5,8 @@ public class InputUtils {
 		int i = 0;
 		while (true) {
 			i = Input.nextInt();
-			if (i < 1 || i > 7) {
-				System.out.println("1~7で入力してください。");
+			if (i < 0 || i > 7) {
+				System.out.println("0~7で入力してください。");
 				continue;
 			} else {
 				break;

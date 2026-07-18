@@ -7,9 +7,9 @@ import com.tktkgg.self_control.util.Input;
 import com.tktkgg.self_control.util.SessionManager;
 
 public class HomeView {
-	ScheduleView sv = new ScheduleView();
-	UserView uv = new UserView();
-	AuthService as = new AuthService();
+	private final ScheduleView sv = new ScheduleView();
+	private final UserView uv = new UserView();
+	private final AuthService as = new AuthService();
 	
 	public void homeView() throws ClassNotFoundException, SQLException {
 		while(true) {

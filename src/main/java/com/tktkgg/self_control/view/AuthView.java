@@ -7,7 +7,7 @@ import com.tktkgg.self_control.service.AuthService;
 import com.tktkgg.self_control.util.Input;
 
 public class AuthView {
-	private AuthService as = new AuthService();
+	private final AuthService as = new AuthService();
 	
 	public void startView() throws ClassNotFoundException, SQLException {
 		while(true) {

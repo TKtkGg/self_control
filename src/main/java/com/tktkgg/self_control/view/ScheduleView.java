@@ -17,8 +17,8 @@ import com.tktkgg.self_control.util.ScheduleUtils;
 import com.tktkgg.self_control.util.SessionManager;
 
 public class ScheduleView {
-	ScheduleService ss = new ScheduleService();
-	TaskService ts = new TaskService();
+	private final ScheduleService ss = new ScheduleService();
+	private final TaskService ts = new TaskService();
 	
 	private boolean checkTimeReverse(LocalTime startTime, LocalTime endTime) {
 		boolean isReverse = false;

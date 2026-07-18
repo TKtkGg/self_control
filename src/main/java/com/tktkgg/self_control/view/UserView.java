@@ -19,10 +19,10 @@ import com.tktkgg.self_control.util.ScheduleUtils;
 import com.tktkgg.self_control.util.SessionManager;
 
 public class UserView {
-	UserService us = new UserService();
-	ScheduleService ss = new ScheduleService();
-	TaskService ts = new TaskService();
-	LikeService ls = new LikeService();
+	private final UserService us = new UserService();
+	private final ScheduleService ss = new ScheduleService();
+	private final TaskService ts = new TaskService();
+	private final LikeService ls = new LikeService();
 	
 	public void usersView() throws ClassNotFoundException, SQLException {
 		List<User> users = us.getUsers();
@@ -64,7 +64,7 @@ public class UserView {
 			DayOfWeek day = DayOfWeek.of(i);
 			
 			Schedule schedule = ss.getSpecificSchedule(user, day);
-			if (ScheduleUtils.isScheduleNull(schedule)) break;
+			if (ScheduleUtils.isScheduleNull(schedule)) continue;
 			
 			List<Task> tasks = ts.getTasks(schedule.getId());
 		
@@ -78,7 +78,8 @@ public class UserView {
 				System.out.println(task.getMemo());
 				System.out.println();
 			}
-			System.out.println("いいね！：" + ls.countLikes(schedule.getId()));
+			int likeCount = ls.countLikes(schedule.getId());
+			System.out.println("いいね！：" + likeCount);
 			
 			System.out.println();
 			

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,17 +80,24 @@ public class UserDao {
 		String sql = "INSERT INTO users(username, email, password) VALUES(?, ?, ?)";
 		
 		try (Connection con = DBConnection.getConnection();
-			PreparedStatement pstmt = con.prepareStatement(sql)) {
+			PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 			
 			pstmt.setString(1, user.getUsername());
 			pstmt.setString(2, user.getEmail());
 			pstmt.setString(3, user.getPassword());
 			
 			int count = pstmt.executeUpdate();
-
 			if (count == 0) {
 			    throw new SQLException("作成できませんでした");
 			}
+			
+			try (ResultSet rs = pstmt.getGeneratedKeys()) {
+				if (rs.next()) {
+					user.setId(rs.getInt(1));
+					return;
+				}
+			}
+			throw new SQLException("IDの取得に失敗しました");
 		}	
 	}
 	

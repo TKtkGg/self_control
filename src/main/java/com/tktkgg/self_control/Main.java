@@ -2,12 +2,13 @@ package com.tktkgg.self_control;
 
 import java.sql.SQLException;
 
+import com.tktkgg.self_control.exception.InvalidTimeException;
 import com.tktkgg.self_control.util.Input;
 import com.tktkgg.self_control.view.AuthView;
 import com.tktkgg.self_control.view.HomeView;
 
 public class Main {
-	public static void main(String[] args) throws ClassNotFoundException, SQLException {
+	public static void main(String[] args) throws ClassNotFoundException, SQLException, InvalidTimeException {
 		AuthView authView = new AuthView();
 		HomeView homeView = new HomeView();
 		

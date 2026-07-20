@@ -71,5 +71,18 @@ public class Task {
 	public String toString() {
 		return "id=" + this.id + " scheduleId=" + this.scheduleId + " startTime=" + this.startTime + " endTime=" + this.endTime + " taskName=" + this.taskName + " memo=" + this.memo;
 	}
+	
+	
+	public boolean isTimeValid() {
+		return startTime.isBefore(endTime);
+	}
+	
+	public String getTimeRange() {
+		return startTime + " ~ " + endTime;
+	}
+	
+	public boolean belongsTo(Schedule schedule) {
+		return this.getScheduleId() == schedule.getId();
+	}
 }
 

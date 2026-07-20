@@ -3,50 +3,30 @@ package com.tktkgg.self_control.view;
 import java.sql.SQLException;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.time.format.TextStyle;
 import java.util.List;
-import java.util.Locale;
 
+import com.tktkgg.self_control.exception.InvalidTimeException;
 import com.tktkgg.self_control.model.Schedule;
 import com.tktkgg.self_control.model.Task;
 import com.tktkgg.self_control.service.ScheduleService;
 import com.tktkgg.self_control.service.TaskService;
 import com.tktkgg.self_control.util.Input;
 import com.tktkgg.self_control.util.InputUtils;
-import com.tktkgg.self_control.util.ScheduleUtils;
 import com.tktkgg.self_control.util.SessionManager;
 
 public class ScheduleView {
 	private final ScheduleService ss = new ScheduleService();
 	private final TaskService ts = new TaskService();
 	
-	private boolean checkTimeReverse(LocalTime startTime, LocalTime endTime) {
-		boolean isReverse = false;
-		if (!startTime.isBefore(endTime)) {
-			System.out.println("開始時間が終了時間より遅い時間にありますが、本当によろしいですか？（1:はい 2:いいえ");
-			while (true) {
-			    int choice = Input.nextInt();
-			    if (choice == 1) {
-			    	isReverse = true;
-			        break;
-			    } else if (choice == 2) {
-			        System.out.println("作成しませんでした。");
-			        isReverse = false;
-			        break;
-			    }
-			    System.out.println("1か2を入力してください。");
-			}
-		}
-		return isReverse;
-	}
-
-	
 	public void checkScheduleView(boolean isToday) throws ClassNotFoundException, SQLException {
 		Schedule schedule = null;
 		List<Task> tasks = null;
 		if (isToday) {
 			schedule = ss.getTodaySchedule();
-			if (ScheduleUtils.isScheduleNull(schedule)) return;
+			if (schedule == null) {
+				System.out.println("スケジュールが存在していません");
+				return;
+			}
 			
 			tasks = ts.getTasks(schedule.getId());
 		} else {
@@ -57,18 +37,21 @@ public class ScheduleView {
 			DayOfWeek day = DayOfWeek.of(i);
 			
 			schedule = ss.getSpecificSchedule(day);
-			if (ScheduleUtils.isScheduleNull(schedule)) return;
+			if (schedule == null) {
+				System.out.println("スケジュールが存在していません");
+				return;
+			}
 			
 			tasks = ts.getTasks(schedule.getId());
 		}
 		
 		System.out.println();
 		
-		System.out.println(schedule.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.JAPANESE) + "のスケジュール");
+		System.out.println(schedule.getDisplayDay() + "のスケジュール");
 		System.out.println("タイトル：" + schedule.getTitle());
 		for (Task task : tasks) {
 			System.out.println(task.getTaskName());
-			System.out.println(task.getStartTime() + " ~ " + task.getEndTime());
+			System.out.println(task.getTimeRange());
 			System.out.println(task.getMemo());
 			System.out.println();
 		}
@@ -76,7 +59,7 @@ public class ScheduleView {
 		System.out.println();
 	}
 	
-	public void editScheduleView() throws ClassNotFoundException, SQLException {
+	public void editScheduleView() throws ClassNotFoundException, SQLException, InvalidTimeException {
 		System.out.println("何曜日を編集しますか？（1:月 2:火 3:水 4:木 5:金 6:土 7:日）（0で戻る）");
 		int i = InputUtils.inputWeek();
 		if (i == 0) return;
@@ -84,7 +67,10 @@ public class ScheduleView {
 		DayOfWeek day = DayOfWeek.of(i);
 		
 		Schedule schedule = ss.getSpecificSchedule(day);
-		if (ScheduleUtils.isScheduleNull(schedule)) return;
+		if (schedule == null) {
+			System.out.println("スケジュールが存在していません");
+			return;
+		}
 		
 		List<Task> tasks = ts.getTasks(schedule.getId());
 		if (tasks.isEmpty()) {
@@ -99,7 +85,7 @@ public class ScheduleView {
 		for (Task task : tasks) {
 			System.out.println(task.getId());
 			System.out.println(task.getTaskName());
-			System.out.println(task.getStartTime() + " ~ " + task.getEndTime());
+			System.out.println(task.getTimeRange());
 		}
 		System.out.println("どのタスクを編集しますか？（番号を入力）");
 		
@@ -108,7 +94,7 @@ public class ScheduleView {
 			int id = Input.nextInt();
 			
 			task = ts.getTask(id);
-			if (task == null || task.getScheduleId() != schedule.getId()) {
+			if (task == null || !task.belongsTo(schedule)) {
 				System.out.println("存在しないIDです。");
 				continue;
 			} else {
@@ -153,12 +139,10 @@ public class ScheduleView {
 		while (true) {
 			int isComplete = Input.nextInt();
 			if (isComplete == 1) {
-				if(checkTimeReverse(startTime, endTime)) return;
 				
 				Schedule newSchedule = new Schedule(schedule.getId(), SessionManager.getUser().getId(), day, title);
 				Task newTask = new Task(task.getId(), schedule.getId(), startTime, endTime, name, memo);
-				ss.updateSchedule(newSchedule);
-				ts.updateTask(newTask);
+				ss.updateSchedule(newSchedule, newTask);
 				
 				System.out.println("更新が完了しました。");
 				break;
@@ -172,7 +156,7 @@ public class ScheduleView {
 		}
 	}
 	
-	public void addScheduleView() throws ClassNotFoundException, SQLException {
+	public void addScheduleView() throws ClassNotFoundException, SQLException, InvalidTimeException {
 		System.out.println("何曜日に追加しますか？（1:月 2:火 3:水 4:木 5:金 6:土 7:日）（0で戻る）");
 		int i = InputUtils.inputWeek();
 		if (i == 0) return;
@@ -219,13 +203,10 @@ public class ScheduleView {
 			int isComplete = Input.nextInt();
 			
 			if (isComplete == 1) {
-				if(checkTimeReverse(startTime, endTime)) return;
-				
 				if (schedule == null) {
 					Schedule newSchedule = new Schedule(0, SessionManager.getUser().getId(), day, title);
-					ss.createSchedule(newSchedule);
 					Task newTask = new Task(0, newSchedule.getId(), startTime, endTime, name, memo);
-					ts.createTask(newTask);
+					ss.createSchedule(newSchedule, newTask);
 				} else {
 					Task newTask = new Task(0, schedule.getId(), startTime, endTime, name, memo);
 					ts.createTask(newTask);

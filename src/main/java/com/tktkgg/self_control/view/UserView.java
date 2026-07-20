@@ -15,7 +15,6 @@ import com.tktkgg.self_control.service.TaskService;
 import com.tktkgg.self_control.service.UserService;
 import com.tktkgg.self_control.util.Input;
 import com.tktkgg.self_control.util.InputUtils;
-import com.tktkgg.self_control.util.ScheduleUtils;
 import com.tktkgg.self_control.util.SessionManager;
 
 public class UserView {
@@ -64,7 +63,10 @@ public class UserView {
 			DayOfWeek day = DayOfWeek.of(i);
 			
 			Schedule schedule = ss.getSpecificSchedule(user, day);
-			if (ScheduleUtils.isScheduleNull(schedule)) continue;
+			if (schedule == null) {
+				System.out.println("スケジュールが存在しません");
+				continue;
+			}
 			
 			List<Task> tasks = ts.getTasks(schedule.getId());
 		

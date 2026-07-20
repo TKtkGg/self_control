@@ -1,6 +1,8 @@
 package com.tktkgg.self_control.model;
 
 import java.time.DayOfWeek;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 public class Schedule {
 	private int id;
@@ -51,4 +53,9 @@ public class Schedule {
 	public String toString() {
 		return "id=" + this.id + " userId=" + this.userId + " dayOfWeek=" + this.dayOfWeek + "title=" + this.title;
 	}
+	
+	public String getDisplayDay() {
+		return getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.JAPAN);
+	}
+	
 }

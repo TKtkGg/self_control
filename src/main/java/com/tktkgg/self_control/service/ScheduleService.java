@@ -48,8 +48,8 @@ public class ScheduleService {
 			throw new InvalidTimeException("無効な時間です");
 		}
 		
-		sd.create(schedule);
-		task.setId(schedule.getId());
+		Schedule newSchedule = sd.create(schedule);
+		task.setScheduleId(newSchedule.getId());
 		td.create(task);
 	}
 	

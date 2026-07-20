@@ -2,7 +2,6 @@ package com.tktkgg.self_control.view;
 
 import java.sql.SQLException;
 import java.time.DayOfWeek;
-import java.time.LocalTime;
 import java.util.List;
 
 import com.tktkgg.self_control.exception.InvalidTimeException;
@@ -17,6 +16,7 @@ import com.tktkgg.self_control.util.SessionManager;
 public class ScheduleView {
 	private final ScheduleService ss = new ScheduleService();
 	private final TaskService ts = new TaskService();
+	private final ScheduleInputView sv = new ScheduleInputView();
 	
 	public void checkScheduleView(boolean isToday) throws ClassNotFoundException, SQLException {
 		Schedule schedule = null;
@@ -49,12 +49,7 @@ public class ScheduleView {
 		
 		System.out.println(schedule.getDisplayDay() + "のスケジュール");
 		System.out.println("タイトル：" + schedule.getTitle());
-		for (Task task : tasks) {
-			System.out.println(task.getTaskName());
-			System.out.println(task.getTimeRange());
-			System.out.println(task.getMemo());
-			System.out.println();
-		}
+		ViewUtils.viewTask(tasks);
 		
 		System.out.println();
 	}
@@ -102,46 +97,14 @@ public class ScheduleView {
 			}
 		}
 		
-		System.out.println("名前：" + task.getTaskName());
-		System.out.print("(入力)→");
-		String name = Input.nextLine();
-		
-		System.out.println("開始時間(時間/h)：" + task.getStartTime());
-		System.out.print("(入力)→");
-		int startTimeH = InputUtils.inputHour();
-		
-		System.out.println("開始時間(分/m)：" + task.getStartTime());
-		System.out.print("(入力)→");
-		int startTimeM = InputUtils.inputMinute();
-		
-		LocalTime startTime = LocalTime.of(startTimeH, startTimeM);
-		
-		System.out.println("終了時間（時間/h）：" + task.getEndTime());
-		System.out.print("(入力)→");
-		int endTimeH = InputUtils.inputHour();
-		
-		System.out.println("終了時間（分/m）：" + task.getEndTime());
-		System.out.print("(入力)→");
-		int endTimeM = InputUtils.inputMinute();
-		
-		LocalTime endTime = LocalTime.of(endTimeH, endTimeM);
-		
-		System.out.println("メモ：" + task.getMemo());
-		System.out.print("(入力)→");
-		String memo = Input.nextLine();
-		
-		System.out.println("この変更でよろしいですか？（1:はい 2:いいえ）");
-		System.out.println("タイトル：" + title);
-		System.out.println("名前：" + name);
-		System.out.println(startTime + " ~ " + endTime);
-		System.out.println("メモ：" + memo);
+		Task newTask = sv.scheduleInputView(schedule, title, task);
 		
 		while (true) {
 			int isComplete = Input.nextInt();
 			if (isComplete == 1) {
-				
 				Schedule newSchedule = new Schedule(schedule.getId(), SessionManager.getUser().getId(), day, title);
-				Task newTask = new Task(task.getId(), schedule.getId(), startTime, endTime, name, memo);
+				newTask.setId(task.getId());
+				newTask.setScheduleId(newSchedule.getId());
 				ss.updateSchedule(newSchedule, newTask);
 				
 				System.out.println("更新が完了しました。");
@@ -165,39 +128,12 @@ public class ScheduleView {
 		Schedule schedule = ss.getSpecificSchedule(day);
 		String title = null;
 		if (schedule == null) {
-			System.out.print("スケジュールタイトル：");
+			System.out.println("スケジュールタイトル");
+			System.out.print("(入力)→");
 			title = Input.nextLine();
 		}
 		
-		System.out.print("名前：");
-		String name = Input.nextLine();
-		
-		System.out.print("開始時間(時間/h)：");
-		int startTimeH = InputUtils.inputHour();
-		
-		System.out.print("開始時間(分/m)：");
-		int startTimeM = InputUtils.inputMinute();
-		
-		LocalTime startTime = LocalTime.of(startTimeH, startTimeM);
-		
-		System.out.print("終了時間（時間/h）：");
-		int endTimeH = InputUtils.inputHour();
-		
-		System.out.print("終了時間（分/m）：");
-		int endTimeM = InputUtils.inputMinute();
-		
-		LocalTime endTime = LocalTime.of(endTimeH, endTimeM);
-		
-		System.out.print("メモ：");
-		String memo = Input.nextLine();
-		
-		System.out.println("この内容でよろしいですか？（1:はい 2:いいえ）");
-		if (schedule == null) {
-			System.out.println("タイトル：" + title);
-		}
-		System.out.println("名前：" + name);
-		System.out.println(startTime + " ~ " + endTime);
-		System.out.println("メモ：" + memo);
+		Task newTask = sv.scheduleInputView(schedule, title, null);
 		
 		while (true) {
 			int isComplete = Input.nextInt();
@@ -205,10 +141,9 @@ public class ScheduleView {
 			if (isComplete == 1) {
 				if (schedule == null) {
 					Schedule newSchedule = new Schedule(0, SessionManager.getUser().getId(), day, title);
-					Task newTask = new Task(0, newSchedule.getId(), startTime, endTime, name, memo);
 					ss.createSchedule(newSchedule, newTask);
 				} else {
-					Task newTask = new Task(0, schedule.getId(), startTime, endTime, name, memo);
+					newTask.setScheduleId(schedule.getId());
 					ts.createTask(newTask);
 				}
 				

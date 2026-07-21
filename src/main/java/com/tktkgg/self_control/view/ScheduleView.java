@@ -18,6 +18,17 @@ public class ScheduleView {
 	private final TaskService ts = new TaskService();
 	private final ScheduleInputView sv = new ScheduleInputView();
 	
+	private boolean confirm() {
+		while (true) {
+	        int input = Input.nextInt();
+
+	        if (input == 1) return true;
+	        if (input == 2) return false;
+
+	        System.out.println("1か2を入力してください。");
+	    }
+	}
+	
 	public void checkScheduleView(boolean isToday) throws ClassNotFoundException, SQLException {
 		Schedule schedule = null;
 		List<Task> tasks = null;
@@ -77,11 +88,7 @@ public class ScheduleView {
 		System.out.print("(入力)→");
 		String title = Input.nextLine();
 		
-		for (Task task : tasks) {
-			System.out.println(task.getId());
-			System.out.println(task.getTaskName());
-			System.out.println(task.getTimeRange());
-		}
+		ViewUtils.viewTaskWithId(tasks);
 		System.out.println("どのタスクを編集しますか？（番号を入力）");
 		
 		Task task = null;
@@ -98,25 +105,17 @@ public class ScheduleView {
 		}
 		
 		Task newTask = sv.scheduleInputView(schedule, title, task);
+		Schedule newSchedule = new Schedule(schedule.getId(), SessionManager.getUser().getId(), day, title);
 		
-		while (true) {
-			int isComplete = Input.nextInt();
-			if (isComplete == 1) {
-				Schedule newSchedule = new Schedule(schedule.getId(), SessionManager.getUser().getId(), day, title);
-				newTask.setId(task.getId());
-				newTask.setScheduleId(newSchedule.getId());
-				ss.updateSchedule(newSchedule, newTask);
-				
-				System.out.println("更新が完了しました。");
-				break;
-			} else if (isComplete == 2) {
-				System.out.println("更新しませんでした。");
-				break;
-			} else {
-				System.out.println("1か2を入力してください。");
-				continue;
-			}
+		if (confirm()) {
+			newTask.setId(task.getId());
+			newTask.setScheduleId(newSchedule.getId());
+			ss.updateSchedule(newSchedule, newTask);
+			System.out.println("更新しました");
+		} else {
+			System.out.println("更新しませんでした");
 		}
+		
 	}
 	
 	public void addScheduleView() throws ClassNotFoundException, SQLException, InvalidTimeException {
@@ -134,28 +133,18 @@ public class ScheduleView {
 		}
 		
 		Task newTask = sv.scheduleInputView(schedule, title, null);
+		Schedule newSchedule = new Schedule(0, SessionManager.getUser().getId(), day, title);
 		
-		while (true) {
-			int isComplete = Input.nextInt();
-			
-			if (isComplete == 1) {
-				if (schedule == null) {
-					Schedule newSchedule = new Schedule(0, SessionManager.getUser().getId(), day, title);
-					ss.createSchedule(newSchedule, newTask);
-				} else {
-					newTask.setScheduleId(schedule.getId());
-					ts.createTask(newTask);
-				}
-				
-				System.out.println("作成しました。");
-				break;
-			} else if (isComplete == 2) {
-				System.out.println("作成しませんでした。");
-				break;
+		if (confirm()) {
+			if (schedule == null) {
+				ss.createSchedule(newSchedule, newTask);
 			} else {
-				System.out.println("1か2を入力してください。");
-				continue;
+				newTask.setScheduleId(schedule.getId());
+				ts.createTask(newTask);
 			}
+			System.out.println("作成しました");
+		} else {
+			System.out.println("作成しませんでした");
 		}
 	}
 }

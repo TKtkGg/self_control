@@ -71,4 +71,13 @@ public class ScheduleInputView {
 		
 		return new Task(0, 0, startTime, endTime, name, memo);
 	}
+	
+	public String inputTitle(String title) {
+		System.out.print("スケジュールタイトル");
+		if (title != "") {
+			System.out.println("：" + title);
+		}
+		System.out.print("(入力)→");
+		return Input.nextLine();
+	}
 }

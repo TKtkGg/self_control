@@ -2,9 +2,7 @@ package com.tktkgg.self_control.view;
 
 import java.sql.SQLException;
 import java.time.DayOfWeek;
-import java.time.format.TextStyle;
 import java.util.List;
-import java.util.Locale;
 
 import com.tktkgg.self_control.model.Schedule;
 import com.tktkgg.self_control.model.Task;
@@ -23,32 +21,47 @@ public class UserView {
 	private final TaskService ts = new TaskService();
 	private final LikeService ls = new LikeService();
 	
+	private void likeView(Schedule schedule) throws ClassNotFoundException, SQLException {
+		if (!ls.isLiked(SessionManager.getUser().getId(), schedule.getId())) {
+			System.out.println("このユーザーのスケジュールに「いいね！」をしますか？（1:はい 2:いいえ）");
+			while (true) {
+				int isLike = Input.nextInt();
+				if (isLike == 1) {
+					ls.like(schedule.getId());
+					System.out.println("「いいね！」しました");
+					break;
+				} else if (isLike == 2) {
+					break;
+				} else {
+					System.out.println("1か2を入力してください。");
+				}
+			}
+		}
+	}
+	
 	public void usersView() throws ClassNotFoundException, SQLException {
 		List<User> users = us.getUsers();
 		while (true) {
 			System.out.println("ユーザーを選択してください（番号を入力）（0で戻る）");
 			System.out.println();
 			
-			for (User user : users) {
-				System.out.println("No." + user.getId());
-				System.out.println(user.getUsername());
-				System.out.println();
-			}
+			ViewUtils.viewUsers(users);
 			
 			int num = 0;
 			while (true) {
 				num = Input.nextInt();
 				if (num == 0) return;
 				
-				if (us.getUser(num) == null) {
+				User user = us.getUser(num);
+				
+				if (user == null) {
 					System.out.println("存在しないユーザーです");
 					continue;
 				} else {
+					userView(user);
 					break;
 				}
 			}
-			
-			userView(us.getUser(num));
 		}
 	}
 	
@@ -72,34 +85,14 @@ public class UserView {
 		
 			System.out.println();
 			
-			System.out.println(schedule.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.JAPANESE) + "のスケジュール");
-			System.out.println("タイトル：" + schedule.getTitle());
-			for (Task task : tasks) {
-				System.out.println(task.getTaskName());
-				System.out.println(task.getStartTime() + " ~ " + task.getEndTime());
-				System.out.println(task.getMemo());
-				System.out.println();
-			}
+			ViewUtils.viewTitle(schedule, tasks);
+			
 			int likeCount = ls.countLikes(schedule.getId());
 			System.out.println("いいね！：" + likeCount);
 			
 			System.out.println();
 			
-			if (!ls.isLiked(SessionManager.getUser().getId(), schedule.getId())) {
-				System.out.println("このユーザーのスケジュールに「いいね！」をしますか？（1:はい 2:いいえ）");
-				while (true) {
-					int isLike = Input.nextInt();
-					if (isLike == 1) {
-						ls.like(schedule.getId());
-						System.out.println("「いいね！」しました");
-						break;
-					} else if (isLike == 2) {
-						break;
-					} else {
-						System.out.println("1か2を入力してください。");
-					}
-				}
-			}
+			likeView(schedule);
 		}
 		
 		

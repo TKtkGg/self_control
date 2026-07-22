@@ -1,7 +1,5 @@
 package com.tktkgg.self_control.view;
 
-import java.sql.SQLException;
-
 import com.tktkgg.self_control.model.User;
 import com.tktkgg.self_control.service.AuthService;
 import com.tktkgg.self_control.util.Input;
@@ -9,7 +7,7 @@ import com.tktkgg.self_control.util.Input;
 public class AuthView {
 	private final AuthService as = new AuthService();
 	
-	public void startView() throws ClassNotFoundException, SQLException {
+	public void startView() {
 		while(true) {
 			System.out.println("1.ログイン\n2.サインアップ");
 			int choice = Input.nextInt();
@@ -31,7 +29,7 @@ public class AuthView {
 		
 	}
 	
-	public boolean loginView() throws ClassNotFoundException, SQLException {
+	public boolean loginView() {
 		System.out.println("メールアドレスとパスワードを入力してください（qで戻る）");
 		
 		while(true) {
@@ -52,7 +50,7 @@ public class AuthView {
 		return false;
 	}
 	
-	public boolean signupView() throws ClassNotFoundException, SQLException {
+	public boolean signupView() {
 		System.out.println("ユーザーネーム、メールアドレス、パスワードを入力してください。（qで戻る）");
 		
 		while(true) {

@@ -1,6 +1,5 @@
 package com.tktkgg.self_control.view;
 
-import java.sql.SQLException;
 import java.time.DayOfWeek;
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class ScheduleView {
 	    }
 	}
 	
-	private Schedule selectSchedule(boolean isToday) throws ClassNotFoundException, SQLException {
+	private Schedule selectSchedule(boolean isToday) {
 		Schedule schedule = null;
 		if (isToday) {
 			schedule = ss.getTodaySchedule();
@@ -55,7 +54,7 @@ public class ScheduleView {
 		return schedule;
 	}
 	
-	public void checkScheduleView(boolean isToday) throws ClassNotFoundException, SQLException {
+	public void checkScheduleView(boolean isToday) {
 		Schedule schedule = null;
 		List<Task> tasks = null;
 		
@@ -73,7 +72,7 @@ public class ScheduleView {
 		System.out.println();
 	}
 	
-	public void editScheduleView() throws ClassNotFoundException, SQLException, InvalidTimeException {
+	public void editScheduleView() {
 		System.out.println("何曜日を編集しますか？（1:月 2:火 3:水 4:木 5:金 6:土 7:日）（0で戻る）");
 		int i = InputUtils.inputWeek();
 		if (i == 0) return;
@@ -116,11 +115,16 @@ public class ScheduleView {
 		if (confirm("更新")) {
 			newTask.setId(task.getId());
 			newTask.setScheduleId(newSchedule.getId());
-			ss.updateSchedule(newSchedule, newTask);
+			try {
+				ss.updateSchedule(newSchedule, newTask);
+			} catch (InvalidTimeException e) {
+				System.out.println(e.getMessage());
+			}
+			
 		}
 	}
 	
-	public void addScheduleView() throws ClassNotFoundException, SQLException, InvalidTimeException {
+	public void addScheduleView() {
 		System.out.println("何曜日に追加しますか？（1:月 2:火 3:水 4:木 5:金 6:土 7:日）（0で戻る）");
 		int i = InputUtils.inputWeek();
 		if (i == 0) return;
@@ -136,12 +140,15 @@ public class ScheduleView {
 		Schedule newSchedule = new Schedule(0, SessionManager.getUser().getId(), day, title);
 		
 		if (confirm("作成")) {
-			if (schedule == null) {
+			try {
 				ss.createSchedule(newSchedule, newTask);
-			} else {
-				newTask.setScheduleId(schedule.getId());
-				ts.createTask(newTask);
-			}
+			} catch (InvalidTimeException e) {
+				System.out.println(e.getMessage());
+			}	
+		} else {
+			newTask.setScheduleId(schedule.getId());
+			ts.createTask(newTask);
 		}
 	}
 }
+

@@ -3,14 +3,20 @@ package com.tktkgg.self_control.service;
 import java.sql.SQLException;
 
 import com.tktkgg.self_control.dao.UserDao;
+import com.tktkgg.self_control.exception.DatabaseException;
 import com.tktkgg.self_control.model.User;
 import com.tktkgg.self_control.util.SessionManager;
 
 public class AuthService {
 	private final UserDao ud = new UserDao();
 	
-	public boolean login(String email, String password) throws ClassNotFoundException, SQLException {
-		User user = ud.findByEmail(email);
+	public boolean login(String email, String password) {
+		User user = null;
+		try {
+			user = ud.findByEmail(email);
+		} catch (SQLException e) {
+			throw new DatabaseException(e);
+		}
 		
 		if (user == null) return false;
 		
@@ -22,8 +28,13 @@ public class AuthService {
 		}
 	}
 	
-	public void signup(User user) throws ClassNotFoundException, SQLException {
-		ud.create(user);
+	public void signup(User user) {
+		try {
+			ud.create(user);
+		} catch (SQLException e) {
+			throw new DatabaseException(e);
+		}
+		
 		SessionManager.setUser(user);
 	}
 	

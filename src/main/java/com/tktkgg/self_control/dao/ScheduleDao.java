@@ -22,7 +22,7 @@ public class ScheduleDao {
 		);
 	}
 	
-	public Schedule findById(int id) throws ClassNotFoundException, SQLException {
+	public Schedule findById(int id) throws SQLException {
 		String sql = "SELECT * FROM schedules WHERE id = ?";
 		
 		try(Connection con = DBConnection.getConnection();
@@ -40,7 +40,7 @@ public class ScheduleDao {
 		}
 	}
 	
-	public List<Schedule> findByUserId(int userId) throws ClassNotFoundException, SQLException {
+	public List<Schedule> findByUserId(int userId) throws SQLException {
 		List<Schedule> scheduleList = new ArrayList<Schedule>();
 		
 		String sql = "SELECT * FROM schedules WHERE user_id = ?";
@@ -62,7 +62,7 @@ public class ScheduleDao {
 		}
 	}
 	
-	public Schedule findByUserIdAndDayOfWeek(int userId, DayOfWeek dayOfWeek) throws ClassNotFoundException, SQLException {
+	public Schedule findByUserIdAndDayOfWeek(int userId, DayOfWeek dayOfWeek) throws SQLException {
 		
 		String sql = "SELECT * FROM schedules WHERE user_id = ? AND day_of_week = ?";
 		
@@ -82,7 +82,7 @@ public class ScheduleDao {
 		}
 	} 
 	
-	public List<Schedule> findAll() throws ClassNotFoundException, SQLException {
+	public List<Schedule> findAll() throws SQLException {
 		List<Schedule> scheduleList = new ArrayList<Schedule>();
 		
 		String sql = "SELECT * FROM schedules ORDER BY id";
@@ -102,7 +102,7 @@ public class ScheduleDao {
 		}
 	}
 	
-	public Schedule create(Schedule schedule) throws ClassNotFoundException, SQLException {
+	public Schedule create(Schedule schedule) throws SQLException {
 		String sql = "INSERT INTO schedules(user_id, day_of_week, title) VALUES(?, ?, ?)";
 		
 		try (Connection con = DBConnection.getConnection();
@@ -128,7 +128,7 @@ public class ScheduleDao {
 		}
 	}
 
-	public void update(Schedule schedule) throws ClassNotFoundException, SQLException {
+	public void update(Schedule schedule) throws SQLException {
 		String sql = "UPDATE schedules SET user_id = ?, day_of_week = ?, title = ? WHERE id = ?";
 		
 		try (Connection con = DBConnection.getConnection();
@@ -147,7 +147,7 @@ public class ScheduleDao {
 		}
 	}
 
-	public void delete(int id) throws ClassNotFoundException, SQLException {
+	public void delete(int id) throws SQLException {
 		String sql = "DELETE FROM schedules WHERE id = ?";
 		
 		try (Connection con = DBConnection.getConnection();

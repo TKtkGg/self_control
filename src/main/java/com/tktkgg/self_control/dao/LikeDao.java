@@ -19,7 +19,7 @@ public class LikeDao {
 		);
 	}
 	
-	public List<Like> findByScheduleId(int scheduleId) throws  ClassNotFoundException, SQLException {
+	public List<Like> findByScheduleId(int scheduleId) throws SQLException {
 		List<Like> likeList = new ArrayList<Like>();
 		
 		String sql = "SELECT * FROM likes WHERE schedule_id = ?";
@@ -41,7 +41,7 @@ public class LikeDao {
 		}
 	}
 	
-	public boolean exists(int userId, int scheduleId) throws ClassNotFoundException, SQLException {
+	public boolean exists(int userId, int scheduleId) throws SQLException {
 		String sql = "SELECT EXISTS(SELECT 1 FROM likes WHERE user_id = ? AND schedule_id = ?) AS liked";
 		
 		try(Connection con = DBConnection.getConnection();
@@ -60,7 +60,7 @@ public class LikeDao {
 		}
 	}
 	
-	public int countByScheduleId(int scheduleId) throws  ClassNotFoundException, SQLException {
+	public int countByScheduleId(int scheduleId) throws SQLException {
 		int likeCount = 0;
 		
 		String sql = "SELECT COUNT(*) AS like_count FROM likes WHERE schedule_id = ?";
@@ -80,7 +80,7 @@ public class LikeDao {
 		}
 	}
 	
-	public void create(Like like) throws ClassNotFoundException, SQLException {
+	public void create(Like like) throws SQLException {
 		String sql = "INSERT INTO likes(user_id, schedule_id) VALUES(?, ?)";
 		
 		try (Connection con = DBConnection.getConnection();
@@ -97,7 +97,7 @@ public class LikeDao {
 		}	
 	}
 	
-	public void delete(int userId, int scheduleId) throws ClassNotFoundException, SQLException {
+	public void delete(int userId, int scheduleId) throws SQLException {
 		String sql = "DELETE FROM likes WHERE user_id = ? AND schedule_id = ?";
 		
 		try (Connection con = DBConnection.getConnection();

@@ -23,7 +23,7 @@ public class TaskDao {
 		);
 	}
 	
-	public Task findById(int id) throws ClassNotFoundException, SQLException {
+	public Task findById(int id) throws SQLException {
 		String sql = "SELECT * FROM tasks WHERE id = ?";
 		
 		try(Connection con = DBConnection.getConnection();
@@ -41,7 +41,7 @@ public class TaskDao {
 		}
 	}
 	
-	public List<Task> findByScheduleId(int scheduleId) throws ClassNotFoundException, SQLException {
+	public List<Task> findByScheduleId(int scheduleId) throws SQLException {
 		List<Task> taskList = new ArrayList<Task>();
 		
 		String sql = "SELECT * FROM tasks WHERE schedule_id = ? ORDER BY start_time";
@@ -63,7 +63,7 @@ public class TaskDao {
 		}
 	}
 	
-	public void create(Task task) throws ClassNotFoundException, SQLException {
+	public void create(Task task) throws SQLException {
 		String sql = "INSERT INTO tasks(schedule_id, start_time, end_time, task_name, memo) VALUES(?, ?, ?, ?, ?)";
 		
 		try (Connection con = DBConnection.getConnection();
@@ -83,7 +83,7 @@ public class TaskDao {
 		}
 	}
 
-	public void update(Task task) throws ClassNotFoundException, SQLException {
+	public void update(Task task) throws SQLException {
 		String sql = "UPDATE tasks SET schedule_id = ?, start_time = ?, end_time = ?, task_name = ?, memo = ? WHERE id = ?";
 		
 		try (Connection con = DBConnection.getConnection();
@@ -104,7 +104,7 @@ public class TaskDao {
 		}
 	}
 
-	public void delete(int id) throws ClassNotFoundException, SQLException {
+	public void delete(int id) throws SQLException {
 		String sql = "DELETE FROM tasks WHERE id = ?";
 		
 		try (Connection con = DBConnection.getConnection();

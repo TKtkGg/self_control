@@ -22,7 +22,7 @@ public class UserDao {
 		);
 	}
 	
-	public User findById(int id) throws ClassNotFoundException, SQLException {
+	public User findById(int id) throws SQLException {
 		String sql = "SELECT * FROM users WHERE id = ?";
 		
 		try (Connection con = DBConnection.getConnection();
@@ -40,7 +40,7 @@ public class UserDao {
 		}
 	}
 	
-	public User findByEmail(String email) throws ClassNotFoundException, SQLException {
+	public User findByEmail(String email) throws SQLException {
 		String sql = "SELECT * FROM users WHERE email = ?";
 		
 		try (Connection con = DBConnection.getConnection();
@@ -58,7 +58,7 @@ public class UserDao {
 		}	
 	}
 	
-	public List<User> findAll() throws ClassNotFoundException, SQLException {
+	public List<User> findAll() throws SQLException {
 		List<User> userList = new ArrayList<User>();
 		String sql = "SELECT * FROM users ORDER BY id";
 		
@@ -76,7 +76,7 @@ public class UserDao {
 		}
 	}
 	
-	public void create(User user) throws ClassNotFoundException, SQLException {
+	public void create(User user) throws SQLException {
 		String sql = "INSERT INTO users(username, email, password) VALUES(?, ?, ?)";
 		
 		try (Connection con = DBConnection.getConnection();
@@ -101,7 +101,7 @@ public class UserDao {
 		}	
 	}
 	
-	public void update(User user) throws ClassNotFoundException, SQLException {
+	public void update(User user) throws SQLException {
 		String sql = "UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?";
 		
 		try (Connection con = DBConnection.getConnection();
@@ -120,7 +120,7 @@ public class UserDao {
 		}	
 	}
 	
-	public void delete(int id) throws ClassNotFoundException, SQLException {
+	public void delete(int id) throws SQLException {
 		String sql = "DELETE FROM users WHERE id = ?";
 		
 		try (Connection con = DBConnection.getConnection();

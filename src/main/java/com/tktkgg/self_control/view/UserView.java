@@ -1,6 +1,5 @@
 package com.tktkgg.self_control.view;
 
-import java.sql.SQLException;
 import java.time.DayOfWeek;
 import java.util.List;
 
@@ -21,7 +20,7 @@ public class UserView {
 	private final TaskService ts = new TaskService();
 	private final LikeService ls = new LikeService();
 	
-	private void likeView(Schedule schedule) throws ClassNotFoundException, SQLException {
+	private void likeView(Schedule schedule) {
 		if (!ls.isLiked(SessionManager.getUser().getId(), schedule.getId())) {
 			System.out.println("このユーザーのスケジュールに「いいね！」をしますか？（1:はい 2:いいえ）");
 			while (true) {
@@ -39,7 +38,7 @@ public class UserView {
 		}
 	}
 	
-	public void usersView() throws ClassNotFoundException, SQLException {
+	public void usersView() {
 		List<User> users = us.getUsers();
 		while (true) {
 			System.out.println("ユーザーを選択してください（番号を入力）（0で戻る）");
@@ -65,7 +64,7 @@ public class UserView {
 		}
 	}
 	
-	public void userView(User user) throws ClassNotFoundException, SQLException {
+	public void userView(User user) {
 		System.out.println("No." + user.getId());
 		System.out.println(user.getUsername());
 		while (true) {

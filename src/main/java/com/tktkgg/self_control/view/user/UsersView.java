@@ -12,6 +12,7 @@ public class UsersView implements MenuAction {
 	private final UserService us = new UserService();
 	private final UserView uv = new UserView();
 	
+	@Override
 	public void execute() {
 		List<User> users = us.getUsers();
 		while (true) {

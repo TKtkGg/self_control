@@ -1,4 +1,4 @@
-package com.tktkgg.self_control.view;
+package com.tktkgg.self_control.view.schedule;
 
 import java.time.LocalTime;
 

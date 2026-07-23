@@ -11,7 +11,6 @@ import com.tktkgg.self_control.util.Input;
 import com.tktkgg.self_control.util.InputUtils;
 import com.tktkgg.self_control.util.SessionManager;
 import com.tktkgg.self_control.view.MenuAction;
-import com.tktkgg.self_control.view.ScheduleInputView;
 
 public class AddScheduleView implements MenuAction {
 	private final ScheduleService ss = new ScheduleService();
@@ -35,6 +34,7 @@ public class AddScheduleView implements MenuAction {
 	    }
 	}
 	
+	@Override
 	public void execute() {
 		System.out.println("何曜日に追加しますか？（1:月 2:火 3:水 4:木 5:金 6:土 7:日）（0で戻る）");
 		int i = InputUtils.inputWeek();

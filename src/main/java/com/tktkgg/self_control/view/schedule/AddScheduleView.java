@@ -1,0 +1,64 @@
+package com.tktkgg.self_control.view.schedule;
+
+import java.time.DayOfWeek;
+
+import com.tktkgg.self_control.exception.InvalidTimeException;
+import com.tktkgg.self_control.model.Schedule;
+import com.tktkgg.self_control.model.Task;
+import com.tktkgg.self_control.service.ScheduleService;
+import com.tktkgg.self_control.service.TaskService;
+import com.tktkgg.self_control.util.Input;
+import com.tktkgg.self_control.util.InputUtils;
+import com.tktkgg.self_control.util.SessionManager;
+import com.tktkgg.self_control.view.MenuAction;
+
+public class AddScheduleView implements MenuAction {
+	private final ScheduleService ss = new ScheduleService();
+	private final TaskService ts = new TaskService();
+	private final ScheduleInputView siv = new ScheduleInputView();
+	
+	private boolean confirm(String action) {
+		while (true) {
+	        int input = Input.nextInt();
+
+	        if (input == 1) {
+	        	System.out.println(action + "しました");
+	        	return true;
+	        }
+	        if (input == 2) {
+	        	System.out.println(action + "しませんでした");
+	        	return false;
+	        }
+
+	        System.out.println("1か2を入力してください。");
+	    }
+	}
+	
+	@Override
+	public void execute() {
+		System.out.println("何曜日に追加しますか？（1:月 2:火 3:水 4:木 5:金 6:土 7:日）（0で戻る）");
+		int i = InputUtils.inputWeek();
+		if (i == 0) return;
+		
+		DayOfWeek day = DayOfWeek.of(i);
+		Schedule schedule = ss.getSpecificSchedule(day);
+		String title = null;
+		if (schedule == null) {
+			title = siv.inputTitle("");
+		}
+		
+		Task newTask = siv.scheduleInputView(schedule, title, null);
+		Schedule newSchedule = new Schedule(0, SessionManager.getUser().getId(), day, title);
+		
+		if (confirm("作成")) {
+			try {
+				ss.createSchedule(newSchedule, newTask);
+			} catch (InvalidTimeException e) {
+				System.out.println(e.getMessage());
+			}	
+		} else {
+			newTask.setScheduleId(schedule.getId());
+			ts.createTask(newTask);
+		}
+	}
+}

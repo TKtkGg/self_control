@@ -1,4 +1,4 @@
-package com.tktkgg.self_control.view;
+package com.tktkgg.self_control.view.user;
 
 import java.time.DayOfWeek;
 import java.util.List;
@@ -9,13 +9,12 @@ import com.tktkgg.self_control.model.User;
 import com.tktkgg.self_control.service.LikeService;
 import com.tktkgg.self_control.service.ScheduleService;
 import com.tktkgg.self_control.service.TaskService;
-import com.tktkgg.self_control.service.UserService;
 import com.tktkgg.self_control.util.Input;
 import com.tktkgg.self_control.util.InputUtils;
 import com.tktkgg.self_control.util.SessionManager;
+import com.tktkgg.self_control.view.ViewUtils;
 
 public class UserView {
-	private final UserService us = new UserService();
 	private final ScheduleService ss = new ScheduleService();
 	private final TaskService ts = new TaskService();
 	private final LikeService ls = new LikeService();
@@ -33,32 +32,6 @@ public class UserView {
 					break;
 				} else {
 					System.out.println("1か2を入力してください。");
-				}
-			}
-		}
-	}
-	
-	public void usersView() {
-		List<User> users = us.getUsers();
-		while (true) {
-			System.out.println("ユーザーを選択してください（番号を入力）（0で戻る）");
-			System.out.println();
-			
-			ViewUtils.viewUsers(users);
-			
-			int num = 0;
-			while (true) {
-				num = Input.nextInt();
-				if (num == 0) return;
-				
-				User user = us.getUser(num);
-				
-				if (user == null) {
-					System.out.println("存在しないユーザーです");
-					continue;
-				} else {
-					userView(user);
-					break;
 				}
 			}
 		}
@@ -93,7 +66,5 @@ public class UserView {
 			
 			likeView(schedule);
 		}
-		
-		
 	}
 }

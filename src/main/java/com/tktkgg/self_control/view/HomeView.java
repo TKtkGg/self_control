@@ -1,42 +1,33 @@
 package com.tktkgg.self_control.view;
 
-import com.tktkgg.self_control.service.AuthService;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.tktkgg.self_control.util.Input;
 import com.tktkgg.self_control.util.SessionManager;
+import com.tktkgg.self_control.view.schedule.AddScheduleView;
+import com.tktkgg.self_control.view.schedule.CheckScheduleView;
+import com.tktkgg.self_control.view.schedule.EditScheduleView;
+import com.tktkgg.self_control.view.user.UsersView;
 
 public class HomeView {
-	private final ScheduleView sv = new ScheduleView();
-	private final UserView uv = new UserView();
-	private final AuthService as = new AuthService();
+	Map<Integer, MenuAction> menu = new HashMap<>();
+	
+	public HomeView() {
+		menu.put(1, new CheckScheduleView(true));
+		menu.put(2, new CheckScheduleView(false));
+		menu.put(3, new EditScheduleView());
+		menu.put(4, new AddScheduleView());
+		menu.put(5, new UsersView());
+		menu.put(6, new LogoutView());
+	}
 	
 	public void homeView() {
 		while(true) {
 			System.out.println("ホーム");
 			System.out.println("1.今日のスケジュールの確認\n2.スケジュールの確認\n3.スケジュールの編集\n4.スケジュールの追加\n5.ユーザー一覧\n6.ログアウト");
-			int choice = Input.nextInt();
 			
-			switch(choice) {
-				case 1:
-					sv.checkScheduleView(true);
-					break;
-				case 2:
-					sv.checkScheduleView(false);
-					break;
-				case 3:
-					sv.editScheduleView();
-					break;
-				case 4:
-					sv.addScheduleView();
-					break;
-				case 5:
-					uv.usersView();
-					break;
-				case 6:
-					as.logout(SessionManager.getUser());
-					break;
-				default:
-					break;
-			}
+			menu.get(Input.nextInt()).execute();
 			
 			if (SessionManager.getUser() == null) {
 				break;

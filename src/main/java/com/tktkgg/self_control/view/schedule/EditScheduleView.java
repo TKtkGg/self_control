@@ -1,4 +1,4 @@
-package com.tktkgg.self_control.view;
+package com.tktkgg.self_control.view.schedule;
 
 import java.time.DayOfWeek;
 import java.util.List;
@@ -11,11 +11,14 @@ import com.tktkgg.self_control.service.TaskService;
 import com.tktkgg.self_control.util.Input;
 import com.tktkgg.self_control.util.InputUtils;
 import com.tktkgg.self_control.util.SessionManager;
+import com.tktkgg.self_control.view.MenuAction;
+import com.tktkgg.self_control.view.ScheduleInputView;
+import com.tktkgg.self_control.view.ViewUtils;
 
-public class ScheduleView {
+public class EditScheduleView implements MenuAction {
 	private final ScheduleService ss = new ScheduleService();
 	private final TaskService ts = new TaskService();
-	private final ScheduleInputView sv = new ScheduleInputView();
+	private final ScheduleInputView siv = new ScheduleInputView();
 	
 	private boolean confirm(String action) {
 		while (true) {
@@ -34,45 +37,7 @@ public class ScheduleView {
 	    }
 	}
 	
-	private Schedule selectSchedule(boolean isToday) {
-		Schedule schedule = null;
-		if (isToday) {
-			schedule = ss.getTodaySchedule();
-		} else {
-			System.out.println("何曜日のスケジュールを確認しますか？（1:月 2:火 3:水 4:木 5:金 6:土 7:日）（0で戻る）");
-			int i = InputUtils.inputWeek();
-			if (i == 0) return null;
-			
-			DayOfWeek day = DayOfWeek.of(i);
-			
-			schedule = ss.getSpecificSchedule(day);
-		}
-		
-		if (schedule == null) {
-			System.out.println("スケジュールが存在しません");
-		}
-		return schedule;
-	}
-	
-	public void checkScheduleView(boolean isToday) {
-		Schedule schedule = null;
-		List<Task> tasks = null;
-		
-		schedule = selectSchedule(isToday);
-		if (schedule == null) {
-			return;
-		}
-		
-		tasks = ts.getTasks(schedule.getId());
-		
-		System.out.println();
-		
-		ViewUtils.viewTitle(schedule, tasks);
-		
-		System.out.println();
-	}
-	
-	public void editScheduleView() {
+	public void execute() {
 		System.out.println("何曜日を編集しますか？（1:月 2:火 3:水 4:木 5:金 6:土 7:日）（0で戻る）");
 		int i = InputUtils.inputWeek();
 		if (i == 0) return;
@@ -91,7 +56,7 @@ public class ScheduleView {
 			return;
 		}
 		
-		String title = sv.inputTitle(schedule.getTitle());
+		String title = siv.inputTitle(schedule.getTitle());
 		
 		ViewUtils.viewTaskWithId(tasks);
 		System.out.println("どのタスクを編集しますか？（番号を入力）");
@@ -109,7 +74,7 @@ public class ScheduleView {
 			}
 		}
 		
-		Task newTask = sv.scheduleInputView(schedule, title, task);
+		Task newTask = siv.scheduleInputView(schedule, title, task);
 		Schedule newSchedule = new Schedule(schedule.getId(), SessionManager.getUser().getId(), day, title);
 		
 		if (confirm("更新")) {
@@ -123,32 +88,4 @@ public class ScheduleView {
 			
 		}
 	}
-	
-	public void addScheduleView() {
-		System.out.println("何曜日に追加しますか？（1:月 2:火 3:水 4:木 5:金 6:土 7:日）（0で戻る）");
-		int i = InputUtils.inputWeek();
-		if (i == 0) return;
-		
-		DayOfWeek day = DayOfWeek.of(i);
-		Schedule schedule = ss.getSpecificSchedule(day);
-		String title = null;
-		if (schedule == null) {
-			title = sv.inputTitle("");
-		}
-		
-		Task newTask = sv.scheduleInputView(schedule, title, null);
-		Schedule newSchedule = new Schedule(0, SessionManager.getUser().getId(), day, title);
-		
-		if (confirm("作成")) {
-			try {
-				ss.createSchedule(newSchedule, newTask);
-			} catch (InvalidTimeException e) {
-				System.out.println(e.getMessage());
-			}	
-		} else {
-			newTask.setScheduleId(schedule.getId());
-			ts.createTask(newTask);
-		}
-	}
 }
-

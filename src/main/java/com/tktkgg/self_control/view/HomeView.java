@@ -3,6 +3,7 @@ package com.tktkgg.self_control.view;
 import com.tktkgg.self_control.service.AuthService;
 import com.tktkgg.self_control.util.Input;
 import com.tktkgg.self_control.util.SessionManager;
+import com.tktkgg.self_control.view.schedule.ScheduleView;
 
 public class HomeView {
 	private final ScheduleView sv = new ScheduleView();

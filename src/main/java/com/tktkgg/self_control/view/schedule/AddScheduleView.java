@@ -7,32 +7,15 @@ import com.tktkgg.self_control.model.Schedule;
 import com.tktkgg.self_control.model.Task;
 import com.tktkgg.self_control.service.ScheduleService;
 import com.tktkgg.self_control.service.TaskService;
-import com.tktkgg.self_control.util.Input;
 import com.tktkgg.self_control.util.InputUtils;
 import com.tktkgg.self_control.util.SessionManager;
 import com.tktkgg.self_control.view.MenuAction;
+import com.tktkgg.self_control.view.ViewUtils;
 
 public class AddScheduleView implements MenuAction {
 	private final ScheduleService ss = new ScheduleService();
 	private final TaskService ts = new TaskService();
 	private final ScheduleInputView siv = new ScheduleInputView();
-	
-	private boolean confirm(String action) {
-		while (true) {
-	        int input = Input.nextInt();
-
-	        if (input == 1) {
-	        	System.out.println(action + "しました");
-	        	return true;
-	        }
-	        if (input == 2) {
-	        	System.out.println(action + "しませんでした");
-	        	return false;
-	        }
-
-	        System.out.println("1か2を入力してください。");
-	    }
-	}
 	
 	@Override
 	public void execute() {
@@ -45,12 +28,14 @@ public class AddScheduleView implements MenuAction {
 		String title = null;
 		if (schedule == null) {
 			title = siv.inputTitle("");
+		} else {
+			title = schedule.getTitle();
 		}
 		
 		Task newTask = siv.scheduleInputView(schedule, title, null);
 		Schedule newSchedule = new Schedule(0, SessionManager.getUser().getId(), day, title);
 		
-		if (confirm("作成")) {
+		if (ViewUtils.confirm("作成")) {
 			try {
 				ss.createSchedule(newSchedule, newTask);
 			} catch (InvalidTimeException e) {

@@ -9,7 +9,6 @@ import com.tktkgg.self_control.model.User;
 import com.tktkgg.self_control.service.LikeService;
 import com.tktkgg.self_control.service.ScheduleService;
 import com.tktkgg.self_control.service.TaskService;
-import com.tktkgg.self_control.util.Input;
 import com.tktkgg.self_control.util.InputUtils;
 import com.tktkgg.self_control.util.SessionManager;
 import com.tktkgg.self_control.view.ViewUtils;
@@ -18,24 +17,6 @@ public class UserView {
 	private final ScheduleService ss = new ScheduleService();
 	private final TaskService ts = new TaskService();
 	private final LikeService ls = new LikeService();
-	
-	private void likeView(Schedule schedule) {
-		if (!ls.isLiked(SessionManager.getUser().getId(), schedule.getId())) {
-			System.out.println("このユーザーのスケジュールに「いいね！」をしますか？（1:はい 2:いいえ）");
-			while (true) {
-				int isLike = Input.nextInt();
-				if (isLike == 1) {
-					ls.like(schedule.getId());
-					System.out.println("「いいね！」しました");
-					break;
-				} else if (isLike == 2) {
-					break;
-				} else {
-					System.out.println("1か2を入力してください。");
-				}
-			}
-		}
-	}
 	
 	public void userView(User user) {
 		System.out.println("No." + user.getId());
@@ -64,7 +45,12 @@ public class UserView {
 			
 			System.out.println();
 			
-			likeView(schedule);
+			if (!ls.isLiked(SessionManager.getUser().getId(), schedule.getId())) {
+				System.out.println("このユーザーのスケジュールに「いいね！」をしますか？（1:はい 2:いいえ）");
+				if (ViewUtils.confirm("「いいね！」")) {
+					ls.like(schedule.getId());
+				}
+			}
 		}
 	}
 }

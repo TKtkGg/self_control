@@ -33,11 +33,11 @@ public class AuthView {
 		System.out.println("メールアドレスとパスワードを入力してください（qで戻る）");
 		
 		while(true) {
-			System.out.println("メールアドレス：");
+			System.out.print("メールアドレス：");
 			String email = Input.next();
 			if (email.equals("q")) return true;
 			
-			System.out.println("パスワード");
+			System.out.print("パスワード：");
 			String password = Input.next();
 			
 			if (as.login(email, password)) {
@@ -54,14 +54,14 @@ public class AuthView {
 		System.out.println("ユーザーネーム、メールアドレス、パスワードを入力してください。（qで戻る）");
 		
 		while(true) {
-			System.out.println("ユーザーネーム：");
+			System.out.print("ユーザーネーム：");
 			String username = Input.next();
 			if (username.equals("q")) return true;
 			
-			System.out.println("メールアドレス：");
+			System.out.print("メールアドレス：");
 			String email = Input.next();
 			
-			System.out.println("パスワード");
+			System.out.print("パスワード：");
 			String password = Input.next();
 			
 			User user = new User(username, email, password);

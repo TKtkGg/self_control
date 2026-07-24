@@ -19,23 +19,6 @@ public class EditScheduleView implements MenuAction {
 	private final TaskService ts = new TaskService();
 	private final ScheduleInputView siv = new ScheduleInputView();
 	
-	private boolean confirm(String action) {
-		while (true) {
-	        int input = Input.nextInt();
-
-	        if (input == 1) {
-	        	System.out.println(action + "しました");
-	        	return true;
-	        }
-	        if (input == 2) {
-	        	System.out.println(action + "しませんでした");
-	        	return false;
-	        }
-
-	        System.out.println("1か2を入力してください。");
-	    }
-	}
-	
 	@Override
 	public void execute() {
 		System.out.println("何曜日を編集しますか？（1:月 2:火 3:水 4:木 5:金 6:土 7:日）（0で戻る）");
@@ -77,7 +60,7 @@ public class EditScheduleView implements MenuAction {
 		Task newTask = siv.scheduleInputView(schedule, title, task);
 		Schedule newSchedule = new Schedule(schedule.getId(), SessionManager.getUser().getId(), day, title);
 		
-		if (confirm("更新")) {
+		if (ViewUtils.confirm("更新")) {
 			newTask.setId(task.getId());
 			newTask.setScheduleId(newSchedule.getId());
 			try {

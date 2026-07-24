@@ -37,7 +37,12 @@ public class AddScheduleView implements MenuAction {
 		
 		if (ViewUtils.confirm("作成")) {
 			try {
-				ss.createSchedule(newSchedule, newTask);
+				if (schedule == null) {
+					ss.createSchedule(newSchedule, newTask);
+				} else {
+					newTask.setScheduleId(schedule.getId());
+					ts.createTask(newTask);
+				}	
 			} catch (InvalidTimeException e) {
 				System.out.println(e.getMessage());
 			}	

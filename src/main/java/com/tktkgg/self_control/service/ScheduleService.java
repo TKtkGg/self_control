@@ -74,7 +74,6 @@ public class ScheduleService {
 			task.setScheduleId(newSchedule.getId());
 			td.create(task);
 		} catch (SQLException e) {
-			e.printStackTrace();
 			throw new DatabaseException(e);
 		}
 		

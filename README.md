@@ -1,0 +1,2 @@
+# self_control
+self_control_CLIappのWeb版です

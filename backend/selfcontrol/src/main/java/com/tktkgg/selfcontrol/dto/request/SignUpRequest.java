@@ -13,6 +13,8 @@ public class SignUpRequest {
         this.passwordConfirm = passwordConfirm;
     }
 
+    public SignUpRequest() {}
+
     public String getUsername() {
         return username;
     }

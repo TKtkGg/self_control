@@ -10,6 +10,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
 import com.tktkgg.selfcontrol.repository.UserRepository;
 
@@ -43,6 +45,14 @@ public class AuthService {
 
         SecurityContextRepository repository = new HttpSessionSecurityContextRepository();
         repository.saveContext(context, request, response);
+    }
+
+    public boolean isAuthenticated() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        return authentication != null 
+            && authentication.isAuthenticated()
+            && !(authentication instanceof AnonymousAuthenticationToken);
     }
 
     public void signUp(String username, String email, String password, String passwordConfirm, HttpServletRequest request, HttpServletResponse response) {

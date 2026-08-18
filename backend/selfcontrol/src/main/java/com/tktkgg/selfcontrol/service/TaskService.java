@@ -4,33 +4,23 @@ import java.time.LocalTime;
 import java.time.DayOfWeek;
 import java.util.UUID;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
 import com.tktkgg.selfcontrol.entity.Task;
 import com.tktkgg.selfcontrol.repository.TaskRepository;
 import com.tktkgg.selfcontrol.repository.ScheduleRepository;
 import com.tktkgg.selfcontrol.entity.Schedule;
 
-
 @Service
 public class TaskService  {
     private final TaskRepository taskRepository;
     private final ScheduleRepository scheduleRepository;
+    private final AuthService authService;
 
-    public TaskService(TaskRepository taskRepository, ScheduleRepository scheduleRepository) {
+    public TaskService(TaskRepository taskRepository, ScheduleRepository scheduleRepository, AuthService authService) {
         this.taskRepository = taskRepository;
         this.scheduleRepository = scheduleRepository;
-    }
-
-    private UUID getCurrentUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            throw new IllegalStateException("Unauthorized");
-        }
-        return (UUID) auth.getPrincipal();
+        this.authService = authService;
     }
 
     private boolean isValidTime(LocalTime startTime, LocalTime endTime) {
@@ -49,7 +39,7 @@ public class TaskService  {
 
         Schedule schedule = 
             scheduleRepository.findByUserIdAndDayOfWeek(
-                getCurrentUserId(), DayOfWeek.values()[dayOfWeek]
+                authService.getCurrentUserId(), DayOfWeek.values()[dayOfWeek]
             ).orElseThrow(() -> 
                 new IllegalArgumentException("Schedule not found")
             );
@@ -66,7 +56,7 @@ public class TaskService  {
             new IllegalArgumentException("Task not found")
         );
 
-        if (!task.getSchedule().getUser().getId().equals(getCurrentUserId())) {
+        if (!task.getSchedule().getUser().getId().equals(authService.getCurrentUserId())) {
             throw new IllegalArgumentException("Unauthorized");
         }
 
@@ -88,7 +78,7 @@ public class TaskService  {
             new IllegalArgumentException("Task not found")
         );
 
-        if (!task.getSchedule().getUser().getId().equals(getCurrentUserId())) {
+        if (!task.getSchedule().getUser().getId().equals(authService.getCurrentUserId())) {
             throw new IllegalArgumentException("Unauthorized");
         }
 

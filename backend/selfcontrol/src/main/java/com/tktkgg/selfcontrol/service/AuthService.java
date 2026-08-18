@@ -2,6 +2,8 @@ package com.tktkgg.selfcontrol.service;
 
 import java.util.Optional;
 import java.util.List;
+import java.time.DayOfWeek;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,21 +15,25 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
-import com.tktkgg.selfcontrol.repository.UserRepository;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 
 import com.tktkgg.selfcontrol.entity.User;
+import com.tktkgg.selfcontrol.entity.Schedule;
+import com.tktkgg.selfcontrol.repository.ScheduleRepository;
+import com.tktkgg.selfcontrol.repository.UserRepository;
 
 @Service
 public class AuthService {
     private final UserRepository userRepository;
+    private final ScheduleRepository scheduleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, ScheduleRepository scheduleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.scheduleRepository = scheduleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -55,6 +61,15 @@ public class AuthService {
             && !(authentication instanceof AnonymousAuthenticationToken);
     }
 
+    public UUID getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+            throw new IllegalStateException("Unauthorized");
+        }
+        return (UUID) authentication.getPrincipal();
+    }
+
+    @Transactional
     public void signUp(String username, String email, String password, String passwordConfirm, HttpServletRequest request, HttpServletResponse response) {
         if (!password.equals(passwordConfirm)) {
             throw new IllegalArgumentException("Password and password confirmation do not match");
@@ -69,6 +84,14 @@ public class AuthService {
         user.setEmail(email);
         user.setPasswordHash(passwordEncoder.encode(password));
         userRepository.save(user);
+
+        for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
+            Schedule schedule = new Schedule();
+            schedule.setUser(user);
+            schedule.setDayOfWeek(dayOfWeek);
+            schedule.setTitle("");
+            scheduleRepository.save(schedule);
+        }
 
         establishSession(user, request, response);
     }

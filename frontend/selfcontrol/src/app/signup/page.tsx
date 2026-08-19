@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { apiPost } from "@/lib/apiClient";
+import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
     const [username, setUsername] = useState("");
@@ -10,6 +11,7 @@ export default function SignUpPage() {
     const [passwordConfirm, setPasswordConfirm] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const router = useRouter();
 
     const handleSubmit = async () => {
         try {
@@ -20,6 +22,7 @@ export default function SignUpPage() {
                 passwordConfirm,
             });
             setSuccess("ユーザー登録に成功しました");
+            router.push("/home");
         } catch (error: unknown) {
             if(error instanceof Error) {
                 setError(error.message);

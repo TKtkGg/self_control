@@ -17,6 +17,7 @@ import com.tktkgg.selfcontrol.service.ScheduleService;
 import com.tktkgg.selfcontrol.service.HomeService;
 import com.tktkgg.selfcontrol.dto.response.HomeResponse;
 import com.tktkgg.selfcontrol.dto.request.TaskRequest;
+import com.tktkgg.selfcontrol.dto.request.UpdateTaskRequest;
 
 @RestController
 public class HomeController {
@@ -59,7 +60,7 @@ public class HomeController {
     }
     
     @PatchMapping("/api/home/task/{taskId}")
-    public ResponseEntity<Map<String, String>> updateTask(@PathVariable UUID taskId, @RequestBody TaskRequest request) {
+    public ResponseEntity<Map<String, String>> updateTask(@PathVariable UUID taskId, @RequestBody UpdateTaskRequest request) {
         taskService.updateTask(
             taskId, 
             request.getStartHour(),

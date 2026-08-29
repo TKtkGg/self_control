@@ -181,6 +181,8 @@ export default function HomePage() {
                 <button onClick={() => onCreateTask(dayOfWeek, taskName, startTime, endTime)}>作成</button>
             </div>
         )}
+        
+        <button onClick={() => router.push("/users")}>ユーザー一覧</button>
 
         {error && <div>{error}</div>}
         </div>

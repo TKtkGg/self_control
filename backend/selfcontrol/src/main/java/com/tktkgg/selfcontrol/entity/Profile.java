@@ -27,7 +27,7 @@ public class Profile {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
-    @Column(name = "icon", length = 30)
+    @Column(name = "icon")
     private byte[] icon;
 
     @Column(name = "self_introduce", length = 500)

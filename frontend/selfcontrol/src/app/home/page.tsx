@@ -183,6 +183,8 @@ export default function HomePage() {
         )}
         
         <button onClick={() => router.push("/users")}>ユーザー一覧</button>
+        <br />
+        <button onClick={() => router.push("/setting/profile")}>プロフィール</button>
 
         {error && <div>{error}</div>}
         </div>

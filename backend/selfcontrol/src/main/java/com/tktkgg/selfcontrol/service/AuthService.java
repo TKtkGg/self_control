@@ -22,18 +22,22 @@ import jakarta.transaction.Transactional;
 
 import com.tktkgg.selfcontrol.entity.User;
 import com.tktkgg.selfcontrol.entity.Schedule;
+import com.tktkgg.selfcontrol.entity.Profile;
 import com.tktkgg.selfcontrol.repository.ScheduleRepository;
 import com.tktkgg.selfcontrol.repository.UserRepository;
+import com.tktkgg.selfcontrol.repository.ProfileRepository;
 
 @Service
 public class AuthService {
     private final UserRepository userRepository;
     private final ScheduleRepository scheduleRepository;
+    private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UserRepository userRepository, ScheduleRepository scheduleRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, ScheduleRepository scheduleRepository, ProfileRepository profileRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.scheduleRepository = scheduleRepository;
+        this.profileRepository = profileRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -92,6 +96,12 @@ public class AuthService {
             schedule.setTitle("");
             scheduleRepository.save(schedule);
         }
+
+        Profile profile = new Profile();
+        profile.setUser(user);
+        profile.setIcon(null);
+        profile.setSelfIntroduce("");
+        profileRepository.save(profile);
 
         establishSession(user, request, response);
     }

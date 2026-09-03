@@ -57,4 +57,15 @@ public class UserService {
 
         return new LikeCountResponse(likeRepository.countByTargetUserId(targetUserId));
     }
+
+    public LikeCountResponse unlikeUser(UUID currentUserId, UUID targetUserId) {
+        Optional<Like> existingLike = likeRepository.findByUserIdAndTargetUserId(currentUserId, targetUserId);
+        if (!existingLike.isPresent()) {
+            throw new RuntimeException("Not liked");
+        }
+
+        likeRepository.delete(existingLike.get());
+
+        return new LikeCountResponse(likeRepository.countByTargetUserId(targetUserId));
+    }
 }

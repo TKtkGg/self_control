@@ -23,11 +23,6 @@ public class SettingController {
         this.authService = authService;
     }
 
-    @GetMapping("/api/setting/profile/{userId}")
-    public ProfileResponse getProfile(@PathVariable UUID userId) {
-        return profileService.getProfile(userId);
-    }
-
     @GetMapping("/api/setting/profile")
     public ProfileResponse getProfile() {
         return profileService.getProfile(authService.getCurrentUserId());

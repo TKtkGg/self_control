@@ -7,12 +7,23 @@ public class ProfileResponse {
     private String username;
     private byte[] icon;
     private String selfIntroduce;
+    private int likeCount;
+    private Boolean isLiked;
 
-    public ProfileResponse(UUID id, String username, byte[] icon, String selfIntroduce) {
+    public ProfileResponse(
+        UUID id, 
+        String username, 
+        byte[] icon, 
+        String selfIntroduce,
+        int likeCount,
+        Boolean isLiked
+    ) {
         this.id = id;
         this.username = username;
         this.icon = icon;
         this.selfIntroduce = selfIntroduce;
+        this.likeCount = likeCount;
+        this.isLiked = isLiked;
     }
 
     public UUID getId() {
@@ -29,5 +40,13 @@ public class ProfileResponse {
 
     public String getSelfIntroduce() {
         return this.selfIntroduce;
+    }
+
+    public int getLikeCount() {
+        return this.likeCount;
+    }
+
+    public Boolean getIsLiked() {
+        return this.isLiked;
     }
 }

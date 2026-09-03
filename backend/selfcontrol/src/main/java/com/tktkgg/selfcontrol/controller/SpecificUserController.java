@@ -1,9 +1,7 @@
 package com.tktkgg.selfcontrol.controller;
 
-import java.util.Map;
 import java.util.UUID;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.tktkgg.selfcontrol.service.AuthService;
 import com.tktkgg.selfcontrol.service.UserService;
 import com.tktkgg.selfcontrol.service.ProfileService;
-import com.tktkgg.selfcontrol.dto.response.UserResponse;
 import com.tktkgg.selfcontrol.dto.response.ProfileResponse;
+import com.tktkgg.selfcontrol.dto.response.LikeCountResponse;
 
 @RestController
 public class SpecificUserController {
@@ -37,8 +35,7 @@ public class SpecificUserController {
     }
 
     @PostMapping("/api/users/{userId}/like")
-    public ResponseEntity<Map<String, String>> likeUser(@PathVariable UUID userId) {
-        userService.likeUser(authService.getCurrentUserId(), userId);
-        return ResponseEntity.ok(Map.of("message", "User liked successfully"));
+    public LikeCountResponse likeUser(@PathVariable UUID userId) {
+        return userService.likeUser(authService.getCurrentUserId(), userId);
     }
 }

@@ -17,27 +17,34 @@ public class ProfileService {
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
     private final LikeRepository likeRepository;
+    private final AuthService authService;
 
     public ProfileService(
         UserRepository userRepository,
         ProfileRepository profileRepository, 
-        LikeRepository likeRepository
+        LikeRepository likeRepository,
+        AuthService authService
     ) {
         this.userRepository = userRepository;
         this.profileRepository = profileRepository;
         this.likeRepository = likeRepository;
+        this.authService = authService;
     }
 
     public ProfileResponse getProfile(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         Profile profile = profileRepository.findByUserId(userId);
 
+        Boolean isLiked = getIsLiked(userId);
+
         return new ProfileResponse(
             userId, 
             user.getUsername(), 
             profile.getIcon(), 
             profile.getSelfIntroduce(), 
-            likeRepository.countByTargetUserId(userId));
+            likeRepository.countByTargetUserId(userId),
+            isLiked
+        );
     }
 
     public ProfileResponse updateProfile(UUID userId, UpdateProfileRequest request) {
@@ -55,6 +62,16 @@ public class ProfileService {
             user.getUsername(), 
             profile.getIcon(), 
             profile.getSelfIntroduce(), 
-            likeRepository.countByTargetUserId(userId));
+            likeRepository.countByTargetUserId(userId),
+            null
+        );
+    }
+
+    private Boolean getIsLiked(UUID userId) {
+        if (authService.getCurrentUserId().equals(userId)) {
+            return null;
+        } else {
+            return likeRepository.findByUserIdAndTargetUserId(authService.getCurrentUserId(), userId).isPresent();
+        }
     }
 }

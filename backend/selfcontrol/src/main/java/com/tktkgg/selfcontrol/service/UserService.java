@@ -17,6 +17,7 @@ import com.tktkgg.selfcontrol.entity.Like;
 import com.tktkgg.selfcontrol.repository.LikeRepository;
 import com.tktkgg.selfcontrol.dto.response.UserResponse;
 import com.tktkgg.selfcontrol.dto.response.UsersResponse;
+import com.tktkgg.selfcontrol.dto.response.LikeCountResponse;
 
 @Service
 public class UserService {
@@ -39,7 +40,7 @@ public class UserService {
         return new UsersResponse(userResponses, page, size, users.hasNext());
     }
 
-    public void likeUser(UUID currentUserId, UUID targetUserId) {
+    public LikeCountResponse likeUser(UUID currentUserId, UUID targetUserId) {
         Optional<Like> existingLike = likeRepository.findByUserIdAndTargetUserId(currentUserId, targetUserId);
         if (existingLike.isPresent()) {
             throw new RuntimeException("Already liked");
@@ -53,5 +54,7 @@ public class UserService {
         like.setTargetUser(targetUser);
         like.setCreatedAt(LocalDateTime.now());
         likeRepository.save(like);
+
+        return new LikeCountResponse(likeRepository.countByTargetUserId(targetUserId));
     }
 }

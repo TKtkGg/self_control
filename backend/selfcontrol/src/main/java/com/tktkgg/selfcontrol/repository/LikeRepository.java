@@ -14,4 +14,6 @@ public interface LikeRepository extends JpaRepository<Like, UUID> {
     List<Like> findByUserId(@Param("userId") UUID userId);
 
     List<Like> findByTargetUserId(@Param("targetUserId") UUID targetUserId);
+
+    int countByTargetUserId(@Param("targetUserId") UUID targetUserId);
 }

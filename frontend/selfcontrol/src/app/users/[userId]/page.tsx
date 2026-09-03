@@ -1,7 +1,7 @@
 "use client";
 
 import { use } from "react";
-import { apiGet, apiPost } from "@/lib/apiClient";
+import { apiGet, apiPost, apiDelete } from "@/lib/apiClient";
 import { useState, useEffect } from "react";
 
 type Props = {
@@ -36,7 +36,7 @@ export default function UserPage({ params }: Props) {
     }
 
     const handleUnlike = () => {
-        apiPost(`/api/users/${userId}/unlike`, {}).then((data) => {
+        apiDelete(`/api/users/${userId}/like`).then((data) => {
             setLikeCount(data.likeCount);
         });
     }

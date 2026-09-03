@@ -55,7 +55,7 @@ public class UserService {
         like.setCreatedAt(LocalDateTime.now());
         likeRepository.save(like);
 
-        return new LikeCountResponse(likeRepository.countByTargetUserId(targetUserId));
+        return new LikeCountResponse(likeRepository.countByTargetUserId(targetUserId), true);
     }
 
     public LikeCountResponse unlikeUser(UUID currentUserId, UUID targetUserId) {
@@ -66,6 +66,6 @@ public class UserService {
 
         likeRepository.delete(existingLike.get());
 
-        return new LikeCountResponse(likeRepository.countByTargetUserId(targetUserId));
+        return new LikeCountResponse(likeRepository.countByTargetUserId(targetUserId), false);
     }
 }

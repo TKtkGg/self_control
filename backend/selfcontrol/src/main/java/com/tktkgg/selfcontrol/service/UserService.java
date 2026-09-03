@@ -23,10 +23,12 @@ import com.tktkgg.selfcontrol.dto.response.LikeCountResponse;
 public class UserService {
     private final LikeRepository likeRepository;
     private final UserRepository userRepository;
+    private final AuthService authService;
 
-    public UserService(UserRepository userRepository, LikeRepository likeRepository) {
+    public UserService(UserRepository userRepository, LikeRepository likeRepository, AuthService authService) {
         this.likeRepository = likeRepository;
         this.userRepository = userRepository;
+        this.authService = authService;
     }
 
     public UsersResponse getUsers(int page, int size) {
@@ -35,7 +37,8 @@ public class UserService {
         List<UserResponse> userResponses = 
             users.stream().map(user -> 
                 new UserResponse(user.getId(), user.getUsername())
-            ).collect(Collectors.toList());
+            ).filter(user -> !user.getId().equals(authService.getCurrentUserId()))
+            .collect(Collectors.toList());
 
         return new UsersResponse(userResponses, page, size, users.hasNext());
     }

@@ -32,12 +32,14 @@ export default function UserPage({ params }: Props) {
     const handleLike = () => {
         apiPost(`/api/users/${userId}/like`, {}).then((data) => {
             setLikeCount(data.likeCount);
+            setIsLiked(data.isLiked);
         });
     }
 
     const handleUnlike = () => {
         apiDelete(`/api/users/${userId}/like`).then((data) => {
             setLikeCount(data.likeCount);
+            setIsLiked(data.isLiked);
         });
     }
 
@@ -47,7 +49,7 @@ export default function UserPage({ params }: Props) {
             <p>{username}</p>
             <p>{selfIntroduce}</p>
             <p>いいね数：{likeCount}</p>
-            {isLiked === null ? (
+            {isLiked === null || isLiked === false ? (
                 <button onClick={handleLike}>いいね</button>
             ) : (
                 <button onClick={handleUnlike}>いいね解除</button>

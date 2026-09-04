@@ -12,28 +12,31 @@ import org.springframework.http.ResponseEntity;
 import java.util.Map;
 import java.util.UUID;
 
+import com.tktkgg.selfcontrol.service.AuthService;
 import com.tktkgg.selfcontrol.service.TaskService;
 import com.tktkgg.selfcontrol.service.ScheduleService;
-import com.tktkgg.selfcontrol.service.HomeService;
-import com.tktkgg.selfcontrol.dto.response.HomeResponse;
+import com.tktkgg.selfcontrol.service.UserScheduleService;
+import com.tktkgg.selfcontrol.dto.response.UserScheduleResponse;
 import com.tktkgg.selfcontrol.dto.request.TaskRequest;
 import com.tktkgg.selfcontrol.dto.request.UpdateTaskRequest;
 
 @RestController
 public class HomeController {
+    private final AuthService authService;
     private final TaskService taskService;
     private final ScheduleService scheduleService;
-    private final HomeService homeService;
+    private final UserScheduleService userScheduleService;
 
-    public HomeController(TaskService taskService, ScheduleService scheduleService, HomeService homeService) {
+    public HomeController(AuthService authService, TaskService taskService, ScheduleService scheduleService, UserScheduleService userScheduleService) {
+        this.authService = authService;
         this.taskService = taskService;
         this.scheduleService = scheduleService;
-        this.homeService = homeService;
+        this.userScheduleService = userScheduleService;
     }
 
     @GetMapping("/api/home")
-    public HomeResponse home() {
-        return homeService.getHomeByCurrentUser();
+    public UserScheduleResponse home() {
+        return userScheduleService.getUserSchedule(authService.getCurrentUserId());
     }
 
     @PatchMapping("/api/home/schedule/{dayOfWeek}")

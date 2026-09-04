@@ -2,10 +2,10 @@ package com.tktkgg.selfcontrol.dto.response;
 
 import java.util.List;
 
-public class HomeResponse {
+public class UserScheduleResponse {
     List<DayScheduleResponse> daySchedules;
 
-    public HomeResponse(List<DayScheduleResponse> daySchedules) {
+    public UserScheduleResponse(List<DayScheduleResponse> daySchedules) {
         this.daySchedules = daySchedules;
     }
 

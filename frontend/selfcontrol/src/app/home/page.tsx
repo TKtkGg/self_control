@@ -4,19 +4,8 @@ import { useState, useEffect } from "react";
 import { apiGet, apiPost, apiPatch, apiDelete } from "@/lib/apiClient";
 import { toDayLabel } from "@/lib/dayOfWeek";
 import { useRouter } from "next/navigation";
-
-type Task = {
-    id: string;
-    name: string;
-    startTime: string;
-    endTime: string;
-}
-
-type DaySchedule = {
-    dayOfWeek: number;
-    title: string;
-    tasks: Task[];
-}
+import { DaySchedule } from "@/types/schedule";
+import { Task } from "@/types/schedule";
 
 export default function HomePage() {
     const [days, setDays] = useState<DaySchedule[]>([]);

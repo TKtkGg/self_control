@@ -51,9 +51,9 @@ public class ProfileService {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         Profile profile = profileRepository.findByUserId(userId);
 
-        user.setUsername(request.getUsername());
-        profile.setIcon(request.getIcon());
-        profile.setSelfIntroduce(request.getSelfIntroduce());
+        user.setUsername(request.username());
+        profile.setIcon(request.icon());
+        profile.setSelfIntroduce(request.selfIntroduce());
 
         userRepository.save(user);
         profileRepository.save(profile);

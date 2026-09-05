@@ -2,6 +2,7 @@ package com.tktkgg.selfcontrol.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
 
@@ -23,25 +25,25 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @GetMapping("/api/auth/user")
+    @GetMapping("/user")
     public ResponseEntity<Map<String, Boolean>> getUser() {
         boolean ok = authService.isAuthenticated();
         return ResponseEntity.ok(Map.of("authenticated", ok));
     }
 
-    @PostMapping("/api/auth/signup")
+    @PostMapping("/signup")
     public ResponseEntity<Map<String, String>> signUp(@RequestBody SignUpRequest signUpRequest, HttpServletRequest request, HttpServletResponse response) {
-        authService.signUp(signUpRequest.getUsername(), signUpRequest.getEmail(), signUpRequest.getPassword(), signUpRequest.getPasswordConfirm(), request, response);
+        authService.signUp(signUpRequest.username(), signUpRequest.email(), signUpRequest.password(), signUpRequest.passwordConfirm(), request, response);
         return ResponseEntity.ok(Map.of("message", "User registered successfully"));
     }
 
-    @PostMapping("/api/auth/login")
+    @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
-        authService.login(loginRequest.getEmail(), loginRequest.getPassword(), request, response);
+        authService.login(loginRequest.email(), loginRequest.password(), request, response);
         return ResponseEntity.ok(Map.of("message", "User logged in successfully"));
     }
 
-    @PostMapping("/api/auth/logout")
+    @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logout(HttpServletRequest request, HttpServletResponse response) {
         authService.logout(request, response);
         return ResponseEntity.ok(Map.of("message", "User logged out successfully"));

@@ -1,6 +1,7 @@
 "use client";
 
 import { use } from "react";
+import { useRouter } from "next/navigation";
 import { apiGet, apiPost, apiDelete } from "@/lib/apiClient";
 import { useState, useEffect } from "react";
 
@@ -9,6 +10,7 @@ type Props = {
 }
 
 export default function UserPage({ params }: Props) {
+    const router = useRouter();
     const resolvedParams = use(params);
     const { userId } = resolvedParams;
 
@@ -43,6 +45,10 @@ export default function UserPage({ params }: Props) {
         });
     }
 
+    const handleGetUserSchedule = () => {
+        router.push(`/users/${userId}/schedule`);
+    }
+
     return (
         <div>
             <h1>ユーザー詳細</h1>
@@ -55,6 +61,7 @@ export default function UserPage({ params }: Props) {
                 <button onClick={handleUnlike}>いいね解除</button>
             )}
             <img src={iconSrc} alt="icon" />
+            <button onClick={handleGetUserSchedule}>スケジュールを表示</button>
         </div>
     );
 }

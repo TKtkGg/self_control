@@ -15,6 +15,7 @@ import com.tktkgg.selfcontrol.repository.UserRepository;
 import com.tktkgg.selfcontrol.entity.User;
 import com.tktkgg.selfcontrol.entity.Like;
 import com.tktkgg.selfcontrol.repository.LikeRepository;
+import com.tktkgg.selfcontrol.repository.SettingRepository;
 import com.tktkgg.selfcontrol.dto.response.UserResponse;
 import com.tktkgg.selfcontrol.dto.response.UsersResponse;
 import com.tktkgg.selfcontrol.dto.response.LikeCountResponse;
@@ -23,11 +24,13 @@ import com.tktkgg.selfcontrol.dto.response.LikeCountResponse;
 public class UserService {
     private final LikeRepository likeRepository;
     private final UserRepository userRepository;
+    private final SettingRepository settingRepository;
     private final AuthService authService;
 
-    public UserService(UserRepository userRepository, LikeRepository likeRepository, AuthService authService) {
+    public UserService(UserRepository userRepository, LikeRepository likeRepository, SettingRepository settingRepository, AuthService authService) {
         this.likeRepository = likeRepository;
         this.userRepository = userRepository;
+        this.settingRepository = settingRepository;
         this.authService = authService;
     }
 
@@ -37,7 +40,10 @@ public class UserService {
         List<UserResponse> userResponses = 
             users.stream().map(user -> 
                 new UserResponse(user.getId(), user.getUsername())
-            ).filter(user -> !user.id().equals(authService.getCurrentUserId()))
+            ).filter(user -> !user.id().equals(authService.getCurrentUserId())
+            ).filter(user -> settingRepository.findByUserId(user.id()).
+                                orElseThrow(() -> new RuntimeException("User's setting not found"))
+                                .getIsPublic() == true)
             .collect(Collectors.toList());
 
         return new UsersResponse(userResponses, page, size, users.hasNext());

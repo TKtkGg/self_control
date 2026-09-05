@@ -37,7 +37,7 @@ public class UserService {
         List<UserResponse> userResponses = 
             users.stream().map(user -> 
                 new UserResponse(user.getId(), user.getUsername())
-            ).filter(user -> !user.getId().equals(authService.getCurrentUserId()))
+            ).filter(user -> !user.id().equals(authService.getCurrentUserId()))
             .collect(Collectors.toList());
 
         return new UsersResponse(userResponses, page, size, users.hasNext());

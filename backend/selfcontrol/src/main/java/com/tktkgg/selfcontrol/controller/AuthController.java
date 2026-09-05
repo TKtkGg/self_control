@@ -33,13 +33,13 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<Map<String, String>> signUp(@RequestBody SignUpRequest signUpRequest, HttpServletRequest request, HttpServletResponse response) {
-        authService.signUp(signUpRequest.getUsername(), signUpRequest.getEmail(), signUpRequest.getPassword(), signUpRequest.getPasswordConfirm(), request, response);
+        authService.signUp(signUpRequest.username(), signUpRequest.email(), signUpRequest.password(), signUpRequest.passwordConfirm(), request, response);
         return ResponseEntity.ok(Map.of("message", "User registered successfully"));
     }
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
-        authService.login(loginRequest.getEmail(), loginRequest.getPassword(), request, response);
+        authService.login(loginRequest.email(), loginRequest.password(), request, response);
         return ResponseEntity.ok(Map.of("message", "User logged in successfully"));
     }
 

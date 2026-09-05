@@ -53,12 +53,12 @@ public class HomeController {
     @PostMapping("/task")
     public ResponseEntity<Map<String, String>> createTask(@RequestBody TaskRequest request) {
         taskService.createTask(
-            request.getDayOfWeek(), 
-            request.getStartHour(),
-            request.getStartMinute(), 
-            request.getEndHour(), 
-            request.getEndMinute(), 
-            request.getName()
+            request.dayOfWeek(), 
+            request.startHour(),
+            request.startMinute(), 
+            request.endHour(), 
+            request.endMinute(), 
+            request.name()
         );
 
         return ResponseEntity.ok(Map.of("message", "Task created successfully"));
@@ -68,11 +68,11 @@ public class HomeController {
     public ResponseEntity<Map<String, String>> updateTask(@PathVariable UUID taskId, @RequestBody UpdateTaskRequest request) {
         taskService.updateTask(
             taskId, 
-            request.getStartHour(),
-            request.getStartMinute(), 
-            request.getEndHour(),
-            request.getEndMinute(), 
-            request.getName()
+            request.startHour(),
+            request.startMinute(), 
+            request.endHour(),
+            request.endMinute(), 
+            request.name()
         );
 
         return ResponseEntity.ok(Map.of("message", "Task updated successfully"));

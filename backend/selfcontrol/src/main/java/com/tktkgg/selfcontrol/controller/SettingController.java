@@ -37,12 +37,12 @@ public class SettingController {
         return profileService.updateProfile(authService.getCurrentUserId(), request);
     }
 
-    @GetMapping("/setting")
+    @GetMapping("")
     public SettingResponse getSetting() {
         return settingService.getSetting();
     }
 
-    @PatchMapping("/setting")
+    @PatchMapping("")
     public SettingResponse updateSetting(@RequestBody SettingRequest request) {
         return settingService.updateSetting(request);
     }

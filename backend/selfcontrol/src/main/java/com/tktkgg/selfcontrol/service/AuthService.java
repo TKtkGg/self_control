@@ -22,8 +22,10 @@ import jakarta.transaction.Transactional;
 
 import com.tktkgg.selfcontrol.entity.User;
 import com.tktkgg.selfcontrol.entity.Schedule;
+import com.tktkgg.selfcontrol.entity.Setting;
 import com.tktkgg.selfcontrol.entity.Profile;
 import com.tktkgg.selfcontrol.repository.ScheduleRepository;
+import com.tktkgg.selfcontrol.repository.SettingRepository;
 import com.tktkgg.selfcontrol.repository.UserRepository;
 import com.tktkgg.selfcontrol.repository.ProfileRepository;
 
@@ -32,12 +34,20 @@ public class AuthService {
     private final UserRepository userRepository;
     private final ScheduleRepository scheduleRepository;
     private final ProfileRepository profileRepository;
+    private final SettingRepository settingRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UserRepository userRepository, ScheduleRepository scheduleRepository, ProfileRepository profileRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(
+        UserRepository userRepository, 
+        ScheduleRepository scheduleRepository, 
+        ProfileRepository profileRepository, 
+        SettingRepository settingRepository,
+        PasswordEncoder passwordEncoder
+    ) {
         this.userRepository = userRepository;
         this.scheduleRepository = scheduleRepository;
         this.profileRepository = profileRepository;
+        this.settingRepository = settingRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -102,6 +112,12 @@ public class AuthService {
         profile.setIcon(null);
         profile.setSelfIntroduce("");
         profileRepository.save(profile);
+
+        Setting setting = new Setting();
+        setting.setUser(user);
+        setting.setIsPublic(true);
+        setting.setIsAuthorizeNotification(true);
+        settingRepository.save(setting);
 
         establishSession(user, request, response);
     }

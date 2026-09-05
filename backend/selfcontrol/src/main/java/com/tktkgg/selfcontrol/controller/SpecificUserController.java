@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tktkgg.selfcontrol.service.AuthService;
@@ -17,6 +18,7 @@ import com.tktkgg.selfcontrol.service.UserScheduleService;
 import com.tktkgg.selfcontrol.dto.response.UserScheduleResponse;
 
 @RestController
+@RequestMapping("/api/users")
 public class SpecificUserController {
     private final AuthService authService;
     private final UserService userService;
@@ -35,22 +37,22 @@ public class SpecificUserController {
         this.userScheduleService = userScheduleService;
     }
 
-    @GetMapping("/api/users/{userId}/profile")
+    @GetMapping("/{userId}/profile")
     public ProfileResponse getProfile(@PathVariable UUID userId) {
         return profileService.getProfile(userId);
     }
 
-    @GetMapping("/api/users/{userId}/schedule")
+    @GetMapping("/{userId}/schedule")
     public UserScheduleResponse getUserSchedule(@PathVariable UUID userId) {
         return userScheduleService.getUserSchedule(userId);
     }
 
-    @PostMapping("/api/users/{userId}/like")
+    @PostMapping("/{userId}/like")
     public LikeCountResponse likeUser(@PathVariable UUID userId) {
         return userService.likeUser(authService.getCurrentUserId(), userId);
     }
 
-    @DeleteMapping("/api/users/{userId}/like")
+    @DeleteMapping("/{userId}/like")
     public LikeCountResponse unlikeUser(@PathVariable UUID userId) {
         return userService.unlikeUser(authService.getCurrentUserId(), userId);
     }

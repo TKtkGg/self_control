@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Map;
 import java.util.UUID;
@@ -21,6 +22,7 @@ import com.tktkgg.selfcontrol.dto.request.TaskRequest;
 import com.tktkgg.selfcontrol.dto.request.UpdateTaskRequest;
 
 @RestController
+@RequestMapping("/api/home")
 public class HomeController {
     private final AuthService authService;
     private final TaskService taskService;
@@ -34,12 +36,12 @@ public class HomeController {
         this.userScheduleService = userScheduleService;
     }
 
-    @GetMapping("/api/home")
+    @GetMapping("")
     public UserScheduleResponse home() {
         return userScheduleService.getUserSchedule(authService.getCurrentUserId());
     }
 
-    @PatchMapping("/api/home/schedule/{dayOfWeek}")
+    @PatchMapping("/schedule/{dayOfWeek}")
     public ResponseEntity<Map<String, String>> updateScheduleTitle(
         @PathVariable int dayOfWeek,
         @RequestBody Map<String, String> request
@@ -48,7 +50,7 @@ public class HomeController {
         return ResponseEntity.ok(Map.of("message", "Schedule updated successfully"));
     }
 
-    @PostMapping("/api/home/task")
+    @PostMapping("/task")
     public ResponseEntity<Map<String, String>> createTask(@RequestBody TaskRequest request) {
         taskService.createTask(
             request.getDayOfWeek(), 
@@ -62,7 +64,7 @@ public class HomeController {
         return ResponseEntity.ok(Map.of("message", "Task created successfully"));
     }
     
-    @PatchMapping("/api/home/task/{taskId}")
+    @PatchMapping("/task/{taskId}")
     public ResponseEntity<Map<String, String>> updateTask(@PathVariable UUID taskId, @RequestBody UpdateTaskRequest request) {
         taskService.updateTask(
             taskId, 
@@ -76,7 +78,7 @@ public class HomeController {
         return ResponseEntity.ok(Map.of("message", "Task updated successfully"));
     }
 
-    @DeleteMapping("/api/home/task/{taskId}")
+    @DeleteMapping("/task/{taskId}")
     public ResponseEntity<Map<String, String>> deleteTask(@PathVariable UUID taskId) {
         taskService.deleteTask(taskId);
         return ResponseEntity.ok(Map.of("message", "Task deleted successfully"));

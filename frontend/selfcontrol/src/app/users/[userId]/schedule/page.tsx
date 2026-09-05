@@ -20,7 +20,7 @@ export default function UserSchedulePage({ params }: Props) {
 
     useEffect(() => {
         apiGet(`/api/users/${userId}/schedule`).then((data) => {
-            setDays(data.dayScheduleResponses ?? []);
+            setDays(data.daySchedules ?? []);
         });
 
         const fetchUser = async () => {

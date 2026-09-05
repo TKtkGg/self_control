@@ -21,7 +21,7 @@ export default function HomePage() {
 
     useEffect(() => {
         apiGet("/api/home").then((data) => {
-            setDays(data.dayScheduleResponses ?? []);
+            setDays(data.daySchedules ?? []);
         });
 
         const fetchUser = async () => {
@@ -35,7 +35,7 @@ export default function HomePage() {
 
     const refreshHome = () => {
         apiGet("/api/home").then((data) => {
-            setDays(data.dayScheduleResponses ?? []);
+            setDays(data.daySchedules ?? []);
         });
     }
 
@@ -174,6 +174,8 @@ export default function HomePage() {
         <button onClick={() => router.push("/users")}>ユーザー一覧</button>
         <br />
         <button onClick={() => router.push("/setting/profile")}>プロフィール</button>
+        <br />
+        <button onClick={() => router.push("/setting")}>設定</button>
 
         {error && <div>{error}</div>}
         </div>

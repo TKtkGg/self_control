@@ -20,8 +20,9 @@ public class UsersController {
     @GetMapping("")
     public UsersResponse getUsers(
         @RequestParam(defaultValue = "0") int page, 
-        @RequestParam(defaultValue = "10") int size
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "") String username
     ) {
-        return userService.getUsers(page, size);
+        return userService.getUsers(page, size, username);
     }
 }

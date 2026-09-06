@@ -34,9 +34,19 @@ public class UserService {
         this.authService = authService;
     }
 
-    public UsersResponse getUsers(int page, int size) {
+    public UsersResponse getUsers(int page, int size, String username) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<User> users = userRepository.findAll(pageable);
+        Page<User> users;
+
+        if (username == null || username.trim().isEmpty()) {
+            users = userRepository.findAll(pageable);
+        } else {
+            users = userRepository.findByUsernameContainingIgnoreCase(
+                username.trim(), 
+                pageable
+            );
+        }
+        
         List<UserResponse> userResponses = 
             users.stream().map(user -> 
                 new UserResponse(user.getId(), user.getUsername())

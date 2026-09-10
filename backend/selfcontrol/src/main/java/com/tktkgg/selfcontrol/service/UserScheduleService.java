@@ -12,6 +12,7 @@ import com.tktkgg.selfcontrol.dto.response.TaskResponse;
 
 import java.util.UUID;
 import java.util.List;
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,7 @@ public class UserScheduleService {
     }
 
     public UserScheduleResponse getUserSchedule(UUID userId) {
-        List<Schedule> schedules = scheduleRepository.findByUserId(userId);
+        List<Schedule> schedules = scheduleRepository.findByUserIdOrderByDayOfWeekAsc(userId);
         if (schedules.isEmpty()) {
             return new UserScheduleResponse(List.of());
         }
@@ -34,7 +35,7 @@ public class UserScheduleService {
         List<DayScheduleResponse> dayScheduleResponses = new ArrayList<>();
         
         for (Schedule schedule : schedules) {
-            List<Task> tasks = taskRepository.findByScheduleId(schedule.getId());
+            List<Task> tasks = taskRepository.findByScheduleIdOrderByStartTimeAsc(schedule.getId());
             int dayOfWeek = schedule.getDayOfWeek().ordinal();
             if (tasks.isEmpty()) {
                 dayScheduleResponses.add(new DayScheduleResponse(dayOfWeek, schedule.getTitle(), List.of()));
@@ -48,5 +49,25 @@ public class UserScheduleService {
         }
 
         return new UserScheduleResponse(dayScheduleResponses);
+    }
+
+    public DayScheduleResponse getUserSpecificSchedule(UUID userID, int dayOfWeek) {
+        Schedule schedule = scheduleRepository.findByUserIdAndDayOfWeek(
+            userID, DayOfWeek.values()[dayOfWeek]
+        ).orElseThrow(() -> 
+            new IllegalArgumentException("Schedule not found")
+        );
+
+        List<Task> tasks = taskRepository.findByScheduleIdOrderByStartTimeAsc(schedule.getId());
+
+        List<TaskResponse> taskResponses = tasks.stream()
+                .map(task -> new TaskResponse(task.getId(), task.getName(), task.getStartTime(), task.getEndTime()))
+                .collect(Collectors.toList());
+
+        return new DayScheduleResponse(
+            dayOfWeek,
+            schedule.getTitle(),
+            taskResponses
+        );
     }
 }

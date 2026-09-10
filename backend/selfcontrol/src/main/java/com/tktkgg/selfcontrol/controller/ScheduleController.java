@@ -17,19 +17,20 @@ import com.tktkgg.selfcontrol.service.AuthService;
 import com.tktkgg.selfcontrol.service.TaskService;
 import com.tktkgg.selfcontrol.service.ScheduleService;
 import com.tktkgg.selfcontrol.service.UserScheduleService;
+import com.tktkgg.selfcontrol.dto.response.DayScheduleResponse;
 import com.tktkgg.selfcontrol.dto.response.UserScheduleResponse;
 import com.tktkgg.selfcontrol.dto.request.TaskRequest;
 import com.tktkgg.selfcontrol.dto.request.UpdateTaskRequest;
 
 @RestController
-@RequestMapping("/api/home")
-public class HomeController {
+@RequestMapping("/api/schedule")
+public class ScheduleController {
     private final AuthService authService;
     private final TaskService taskService;
     private final ScheduleService scheduleService;
     private final UserScheduleService userScheduleService;
 
-    public HomeController(AuthService authService, TaskService taskService, ScheduleService scheduleService, UserScheduleService userScheduleService) {
+    public ScheduleController(AuthService authService, TaskService taskService, ScheduleService scheduleService, UserScheduleService userScheduleService) {
         this.authService = authService;
         this.taskService = taskService;
         this.scheduleService = scheduleService;
@@ -37,11 +38,16 @@ public class HomeController {
     }
 
     @GetMapping("")
-    public UserScheduleResponse home() {
+    public UserScheduleResponse getSchedules() {
         return userScheduleService.getUserSchedule(authService.getCurrentUserId());
     }
 
-    @PatchMapping("/schedule/{dayOfWeek}")
+    @GetMapping("/{dayOfWeek}")
+    public DayScheduleResponse getSpecificSchedule(@PathVariable int dayOfWeek) {
+        return userScheduleService.getUserSpecificSchedule(authService.getCurrentUserId(), dayOfWeek);
+    }
+
+    @PatchMapping("/{dayOfWeek}")
     public ResponseEntity<Map<String, String>> updateScheduleTitle(
         @PathVariable int dayOfWeek,
         @RequestBody Map<String, String> request

@@ -31,7 +31,7 @@ export default function SchedulePage() {
             }
         }
         fetchUser();
-    }, []);
+    }, [router]);
 
     const refreshHome = () => {
         apiGet("/api/schedule").then((data) => {

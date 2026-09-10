@@ -17,6 +17,7 @@ import com.tktkgg.selfcontrol.service.AuthService;
 import com.tktkgg.selfcontrol.service.TaskService;
 import com.tktkgg.selfcontrol.service.ScheduleService;
 import com.tktkgg.selfcontrol.service.UserScheduleService;
+import com.tktkgg.selfcontrol.dto.response.DayScheduleResponse;
 import com.tktkgg.selfcontrol.dto.response.UserScheduleResponse;
 import com.tktkgg.selfcontrol.dto.request.TaskRequest;
 import com.tktkgg.selfcontrol.dto.request.UpdateTaskRequest;
@@ -39,6 +40,11 @@ public class ScheduleController {
     @GetMapping("")
     public UserScheduleResponse getSchedules() {
         return userScheduleService.getUserSchedule(authService.getCurrentUserId());
+    }
+
+    @GetMapping("/{dayOfWeek}")
+    public DayScheduleResponse getSpecificSchedule(@PathVariable int dayOfWeek) {
+        return userScheduleService.getUserSpecificSchedule(authService.getCurrentUserId(), dayOfWeek);
     }
 
     @PatchMapping("/{dayOfWeek}")

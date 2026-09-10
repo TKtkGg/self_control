@@ -12,6 +12,7 @@ import com.tktkgg.selfcontrol.dto.response.TaskResponse;
 
 import java.util.UUID;
 import java.util.List;
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -48,5 +49,25 @@ public class UserScheduleService {
         }
 
         return new UserScheduleResponse(dayScheduleResponses);
+    }
+
+    public DayScheduleResponse getUserSpecificSchedule(UUID userID, int dayOfWeek) {
+        Schedule schedule = scheduleRepository.findByUserIdAndDayOfWeek(
+            userID, DayOfWeek.values()[dayOfWeek]
+        ).orElseThrow(() -> 
+            new IllegalArgumentException("Schedule not found")
+        );
+
+        List<Task> tasks = taskRepository.findByScheduleIdOrderByStartTimeAsc(schedule.getId());
+
+        List<TaskResponse> taskResponses = tasks.stream()
+                .map(task -> new TaskResponse(task.getId(), task.getName(), task.getStartTime(), task.getEndTime()))
+                .collect(Collectors.toList());
+
+        return new DayScheduleResponse(
+            dayOfWeek,
+            schedule.getTitle(),
+            taskResponses
+        );
     }
 }

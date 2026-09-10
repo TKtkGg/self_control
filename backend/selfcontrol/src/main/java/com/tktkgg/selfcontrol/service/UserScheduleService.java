@@ -27,7 +27,7 @@ public class UserScheduleService {
     }
 
     public UserScheduleResponse getUserSchedule(UUID userId) {
-        List<Schedule> schedules = scheduleRepository.findByUserId(userId);
+        List<Schedule> schedules = scheduleRepository.findByUserIdOrderByDayOfWeekAsc(userId);
         if (schedules.isEmpty()) {
             return new UserScheduleResponse(List.of());
         }
@@ -35,7 +35,7 @@ public class UserScheduleService {
         List<DayScheduleResponse> dayScheduleResponses = new ArrayList<>();
         
         for (Schedule schedule : schedules) {
-            List<Task> tasks = taskRepository.findByScheduleId(schedule.getId());
+            List<Task> tasks = taskRepository.findByScheduleIdOrderByStartTimeAsc(schedule.getId());
             int dayOfWeek = schedule.getDayOfWeek().ordinal();
             if (tasks.isEmpty()) {
                 dayScheduleResponses.add(new DayScheduleResponse(dayOfWeek, schedule.getTitle(), List.of()));

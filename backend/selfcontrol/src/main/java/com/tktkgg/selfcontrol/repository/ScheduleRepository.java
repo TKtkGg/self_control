@@ -10,5 +10,6 @@ import java.util.Optional;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, UUID> {
     List<Schedule> findByUserId(UUID userId);
+    List<Schedule> findByUserIdOrderByDayOfWeekAsc(UUID userId);
     Optional<Schedule> findByUserIdAndDayOfWeek(UUID userId, DayOfWeek dayOfWeek);
 }

@@ -14,12 +14,12 @@ export default function HomePage() {
         const d = new Date();
         const customDay = (d.getDay() + 6) % 7;
 
-        apiGet(`/api/schedule/${customDay}`).then((data) => {
+        apiGet(`/api/schedules/${customDay}`).then((data) => {
             setDay(data)
         })
 
         const fetchUser = async () => {
-            const response = await apiGet("/api/auth/user");
+            const response = await apiGet("/api/auth/status");
             if (!response.authenticated) {
                 router.push("/");
             }

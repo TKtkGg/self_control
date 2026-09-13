@@ -12,7 +12,7 @@ export default function GlobalAlarm() {
     useEffect(() => {
         const checkAlarm = async () => {
             try {
-                const auth = await apiGet("/api/auth/user");
+                const auth = await apiGet("/api/auth/status");
     
                 if (!auth.authenticated) {
                     return;

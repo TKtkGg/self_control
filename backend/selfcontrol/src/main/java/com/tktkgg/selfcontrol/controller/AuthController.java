@@ -25,7 +25,7 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @GetMapping("/user")
+    @GetMapping("/status")
     public ResponseEntity<Map<String, Boolean>> getUser() {
         boolean ok = authService.isAuthenticated();
         return ResponseEntity.ok(Map.of("authenticated", ok));

@@ -20,12 +20,12 @@ export default function SchedulePage() {
     const router = useRouter();
 
     useEffect(() => {
-        apiGet("/api/schedule").then((data) => {
+        apiGet("/api/schedules").then((data) => {
             setDays(data.daySchedules ?? []);
         });
 
         const fetchUser = async () => {
-            const response = await apiGet("/api/auth/user");
+            const response = await apiGet("/api/auth/status");
             if (!response.authenticated) {
                 router.push("/");
             }
@@ -34,7 +34,7 @@ export default function SchedulePage() {
     }, [router]);
 
     const refreshHome = () => {
-        apiGet("/api/schedule").then((data) => {
+        apiGet("/api/schedules").then((data) => {
             setDays(data.daySchedules ?? []);
         });
     }
@@ -65,7 +65,7 @@ export default function SchedulePage() {
     }
 
     const onUpdateTitle = (dayOfWeek: number, title: string) => {
-        apiPatch(`/api/schedule/${dayOfWeek}`, {
+        apiPatch(`/api/schedules/${dayOfWeek}`, {
             title: title,
         })
         .catch((error) => setError(error.message))
@@ -78,7 +78,7 @@ export default function SchedulePage() {
         const start = splitTime(startTime);
         const end = splitTime(endTime);
 
-        apiPost(`/api/schedule/task`, {
+        apiPost(`/api/tasks`, {
             dayOfWeek: dayOfWeek,
             name: taskName,
             startHour: start.hour,
@@ -97,7 +97,7 @@ export default function SchedulePage() {
         const start = splitTime(startTime);
         const end = splitTime(endTime);
 
-        apiPatch(`/api/schedule/task/${id}`, {
+        apiPatch(`/api/tasks/${id}`, {
             name: taskName,
             startHour: start.hour,
             startMinute: start.minute,
@@ -111,7 +111,7 @@ export default function SchedulePage() {
     const onDeleteTask = (id: string) => {
         setOpenUpdateModal(false);
         setId(id);
-        apiDelete(`/api/schedule/task/${id}`)
+        apiDelete(`/api/tasks/${id}`)
         .catch((error) => setError(error.message))
         .finally(() => refreshHome());
     }

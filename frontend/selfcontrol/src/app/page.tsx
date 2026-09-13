@@ -12,7 +12,7 @@ export default function HomePage() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const response = await apiGet("/api/auth/user");
+      const response = await apiGet("/api/auth/status");
       if (response.authenticated) {
         setAuthenticated(true);
       } else {

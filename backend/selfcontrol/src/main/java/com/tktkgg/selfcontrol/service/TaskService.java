@@ -2,6 +2,7 @@ package com.tktkgg.selfcontrol.service;
 
 import java.time.LocalTime;
 import java.time.DayOfWeek;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -23,17 +24,32 @@ public class TaskService  {
         this.authService = authService;
     }
 
-    private boolean isValidTime(LocalTime startTime, LocalTime endTime) {
-        return startTime.isBefore(endTime);
+    private boolean isValidTime(
+        LocalTime startTime,
+        LocalTime endTime,
+        UUID scheduleId,
+        UUID excludeTaskId
+    ) {
+        if (!startTime.isBefore(endTime)) {
+            return false;
+        }
+    
+        List<Task> tasks = taskRepository.findByScheduleId(scheduleId);
+    
+        return tasks.stream()
+            // 編集時は自分自身を比較対象から除外する
+            .filter(task ->
+                excludeTaskId == null || !excludeTaskId.equals(task.getId())
+            )
+            .noneMatch(task ->
+                startTime.isBefore(task.getEndTime())
+                    && task.getStartTime().isBefore(endTime)
+            );
     }
 
     public void createTask(int dayOfWeek, int startHour, int startMinute, int endHour, int endMinute, String name) {
         LocalTime startTime = LocalTime.of(startHour, startMinute);
         LocalTime endTime = LocalTime.of(endHour, endMinute);
-
-        if (!isValidTime(startTime, endTime)) {
-            throw new IllegalArgumentException("Invalid time");
-        }
 
         Task task = new Task();
 
@@ -43,6 +59,10 @@ public class TaskService  {
             ).orElseThrow(() -> 
                 new IllegalArgumentException("Schedule not found")
             );
+        
+        if (!isValidTime(startTime, endTime, schedule.getId(), null)) {
+            throw new IllegalArgumentException("Invalid time");
+        }
 
         task.setSchedule(schedule);
         task.setStartTime(startTime);
@@ -63,7 +83,7 @@ public class TaskService  {
         LocalTime startTime = LocalTime.of(startHour, startMinute);
         LocalTime endTime = LocalTime.of(endHour, endMinute);
 
-        if (!isValidTime(startTime, endTime)) {
+        if (!isValidTime(startTime, endTime, task.getSchedule().getId(), task.getId())) {
             throw new IllegalArgumentException("Invalid time");
         }
 

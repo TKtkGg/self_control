@@ -15,6 +15,7 @@ import java.util.UUID;
 import com.tktkgg.selfcontrol.service.TaskService;
 import com.tktkgg.selfcontrol.dto.request.TaskRequest;
 import com.tktkgg.selfcontrol.dto.request.UpdateTaskRequest;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -26,7 +27,7 @@ public class TaskController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Map<String, String>> createTask(@RequestBody TaskRequest request) {
+    public ResponseEntity<Map<String, String>> createTask(@Valid @RequestBody TaskRequest request) {
         taskService.createTask(
             request.dayOfWeek(), 
             request.startHour(),
@@ -40,7 +41,7 @@ public class TaskController {
     }
     
     @PatchMapping("/{taskId}")
-    public ResponseEntity<Map<String, String>> updateTask(@PathVariable UUID taskId, @RequestBody UpdateTaskRequest request) {
+    public ResponseEntity<Map<String, String>> updateTask(@PathVariable UUID taskId, @Valid @RequestBody UpdateTaskRequest request) {
         taskService.updateTask(
             taskId, 
             request.startHour(),

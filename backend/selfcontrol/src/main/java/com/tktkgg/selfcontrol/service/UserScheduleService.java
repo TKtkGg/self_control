@@ -15,6 +15,7 @@ import java.util.List;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+import com.tktkgg.selfcontrol.exception.ApiException;
 
 @Service
 public class UserScheduleService {
@@ -53,9 +54,9 @@ public class UserScheduleService {
 
     public DayScheduleResponse getUserSpecificSchedule(UUID userID, int dayOfWeek) {
         Schedule schedule = scheduleRepository.findByUserIdAndDayOfWeek(
-            userID, DayOfWeek.values()[dayOfWeek]
+            userID, toDayOfWeek(dayOfWeek)
         ).orElseThrow(() -> 
-            new IllegalArgumentException("Schedule not found")
+            ApiException.notFound("SCHEDULE_NOT_FOUND", "Schedule not found.")
         );
 
         List<Task> tasks = taskRepository.findByScheduleIdOrderByStartTimeAsc(schedule.getId());
@@ -69,5 +70,15 @@ public class UserScheduleService {
             schedule.getTitle(),
             taskResponses
         );
+    }
+
+    private DayOfWeek toDayOfWeek(int dayOfWeek) {
+        if (dayOfWeek < 0 || dayOfWeek > 6) {
+            throw ApiException.badRequest(
+                "INVALID_DAY_OF_WEEK",
+                "dayOfWeek must be between 0 and 6."
+            );
+        }
+        return DayOfWeek.values()[dayOfWeek];
     }
 }

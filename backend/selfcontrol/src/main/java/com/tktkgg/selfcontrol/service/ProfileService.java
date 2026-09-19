@@ -11,6 +11,7 @@ import com.tktkgg.selfcontrol.dto.response.ProfileResponse;
 import com.tktkgg.selfcontrol.repository.LikeRepository;
 
 import java.util.UUID;
+import com.tktkgg.selfcontrol.exception.ApiException;
 
 @Service
 public class ProfileService {
@@ -32,8 +33,13 @@ public class ProfileService {
     }
 
     public ProfileResponse getProfile(UUID userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() ->
+            ApiException.notFound("USER_NOT_FOUND", "User not found.")
+        );
         Profile profile = profileRepository.findByUserId(userId);
+        if (profile == null) {
+            throw ApiException.internalServerError("PROFILE_NOT_FOUND", "Profile is missing.");
+        }
 
         Boolean isLiked = getIsLiked(userId);
 
@@ -48,8 +54,13 @@ public class ProfileService {
     }
 
     public ProfileResponse updateProfile(UUID userId, UpdateProfileRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() ->
+            ApiException.notFound("USER_NOT_FOUND", "User not found.")
+        );
         Profile profile = profileRepository.findByUserId(userId);
+        if (profile == null) {
+            throw ApiException.internalServerError("PROFILE_NOT_FOUND", "Profile is missing.");
+        }
 
         user.setUsername(request.username());
         profile.setIcon(request.icon());

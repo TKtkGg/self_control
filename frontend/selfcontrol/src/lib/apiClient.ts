@@ -1,13 +1,38 @@
-const handleError = async (response: Response) => {
-    const error = await response.json().catch(() => null);
-    let message = `HTTP ${response.status}`;
+const handleError = async (response: Response): Promise<never> => {
+    const error = await response.json().catch(() => null) as {
+        detail?: unknown;
+        message?: unknown;
+        errors?: unknown;
+    } | null;
 
-    if(typeof error?.message === 'string') {
-        message = error.message;
-        throw new Error(message);
-    } else {
-        throw new Error("通信に失敗しました。");
+    const detail = typeof error?.detail === "string"
+        ? error.detail
+        : typeof error?.message === "string"
+            ? error.message
+            : null;
+
+    const validationMessages = Array.isArray(error?.errors)
+        ? error.errors
+            .map((item) => {
+                if (typeof item !== "object" || item === null) return null;
+                const field = "field" in item && typeof item.field === "string" ? item.field : null;
+                const message = "message" in item && typeof item.message === "string" ? item.message : null;
+                return field && message ? `${field}: ${message}` : message;
+            })
+            .filter((message): message is string => Boolean(message))
+        : [];
+
+    if (detail && validationMessages.length > 0) {
+        throw new Error(`${detail} (${validationMessages.join(", ")})`);
     }
+    if (detail) {
+        throw new Error(detail);
+    }
+    if (validationMessages.length > 0) {
+        throw new Error(validationMessages.join(", "));
+    }
+
+    throw new Error("通信に失敗しました。");
 }
 
 export const apiGet = async(path: string) => {

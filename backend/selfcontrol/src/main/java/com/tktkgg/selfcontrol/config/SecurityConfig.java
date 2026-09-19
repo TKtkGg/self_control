@@ -8,17 +8,26 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+import com.tktkgg.selfcontrol.exception.ApiProblemDetailFactory;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     @Value("${cors.allowed-origins}")
     private String allowedOrigins;
+
+    private final ApiProblemDetailFactory problemDetailFactory;
+
+    public SecurityConfig(ApiProblemDetailFactory problemDetailFactory) {
+        this.problemDetailFactory = problemDetailFactory;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -48,9 +57,26 @@ public class SecurityConfig {
             )
             .exceptionHandling((ex -> ex
                 .authenticationEntryPoint((req, res, authEx) -> {
-                    res.setStatus(401);
-                    res.setContentType("application/json");
-                    res.getWriter().write("{\"authenticated\": false}");
+                    problemDetailFactory.write(
+                        res,
+                        problemDetailFactory.create(
+                            HttpStatus.UNAUTHORIZED,
+                            "UNAUTHORIZED",
+                            "Authentication is required.",
+                            req
+                        )
+                    );
+                })
+                .accessDeniedHandler((req, res, accessDeniedEx) -> {
+                    problemDetailFactory.write(
+                        res,
+                        problemDetailFactory.create(
+                            HttpStatus.FORBIDDEN,
+                            "FORBIDDEN",
+                            "You do not have permission to access this resource.",
+                            req
+                        )
+                    );
                 })
             ))
             .csrf(csrf -> csrf.disable())

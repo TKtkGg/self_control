@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.tktkgg.selfcontrol.dto.response.SettingResponse;
 import com.tktkgg.selfcontrol.dto.request.SettingRequest;
 import com.tktkgg.selfcontrol.service.SettingService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/settings")
@@ -25,7 +26,7 @@ public class SettingController {
     }
 
     @PatchMapping("")
-    public SettingResponse updateSetting(@RequestBody SettingRequest request) {
+    public SettingResponse updateSetting(@Valid @RequestBody SettingRequest request) {
         return settingService.updateSetting(request);
     }
 }

@@ -11,6 +11,8 @@ import com.tktkgg.selfcontrol.entity.Task;
 import com.tktkgg.selfcontrol.repository.TaskRepository;
 import com.tktkgg.selfcontrol.repository.ScheduleRepository;
 import com.tktkgg.selfcontrol.entity.Schedule;
+import com.tktkgg.selfcontrol.exception.ApiException;
+import java.time.DateTimeException;
 
 @Service
 public class TaskService  {
@@ -48,20 +50,23 @@ public class TaskService  {
     }
 
     public void createTask(int dayOfWeek, int startHour, int startMinute, int endHour, int endMinute, String name) {
-        LocalTime startTime = LocalTime.of(startHour, startMinute);
-        LocalTime endTime = LocalTime.of(endHour, endMinute);
+        LocalTime startTime = toLocalTime(startHour, startMinute);
+        LocalTime endTime = toLocalTime(endHour, endMinute);
 
         Task task = new Task();
 
         Schedule schedule = 
             scheduleRepository.findByUserIdAndDayOfWeek(
-                authService.getCurrentUserId(), DayOfWeek.values()[dayOfWeek]
+                authService.getCurrentUserId(), toDayOfWeek(dayOfWeek)
             ).orElseThrow(() -> 
-                new IllegalArgumentException("Schedule not found")
+                ApiException.notFound("SCHEDULE_NOT_FOUND", "Schedule not found.")
             );
         
         if (!isValidTime(startTime, endTime, schedule.getId(), null)) {
-            throw new IllegalArgumentException("Invalid time");
+            throw ApiException.badRequest(
+                "INVALID_TASK_TIME",
+                "Start time must be before end time and tasks must not overlap."
+            );
         }
 
         task.setSchedule(schedule);
@@ -73,18 +78,24 @@ public class TaskService  {
 
     public void updateTask(UUID taskId, int startHour, int startMinute, int endHour, int endMinute, String name) {
         Task task = taskRepository.findById(taskId).orElseThrow(() -> 
-            new IllegalArgumentException("Task not found")
+            ApiException.notFound("TASK_NOT_FOUND", "Task not found.")
         );
 
         if (!task.getSchedule().getUser().getId().equals(authService.getCurrentUserId())) {
-            throw new IllegalArgumentException("Unauthorized");
+            throw ApiException.forbidden(
+                "TASK_ACCESS_DENIED",
+                "You do not have permission to modify this task."
+            );
         }
 
-        LocalTime startTime = LocalTime.of(startHour, startMinute);
-        LocalTime endTime = LocalTime.of(endHour, endMinute);
+        LocalTime startTime = toLocalTime(startHour, startMinute);
+        LocalTime endTime = toLocalTime(endHour, endMinute);
 
         if (!isValidTime(startTime, endTime, task.getSchedule().getId(), task.getId())) {
-            throw new IllegalArgumentException("Invalid time");
+            throw ApiException.badRequest(
+                "INVALID_TASK_TIME",
+                "Start time must be before end time and tasks must not overlap."
+            );
         }
 
         task.setStartTime(startTime);
@@ -95,14 +106,38 @@ public class TaskService  {
 
     public void deleteTask(UUID taskId) {
         Task task = taskRepository.findById(taskId).orElseThrow(() -> 
-            new IllegalArgumentException("Task not found")
+            ApiException.notFound("TASK_NOT_FOUND", "Task not found.")
         );
 
         if (!task.getSchedule().getUser().getId().equals(authService.getCurrentUserId())) {
-            throw new IllegalArgumentException("Unauthorized");
+            throw ApiException.forbidden(
+                "TASK_ACCESS_DENIED",
+                "You do not have permission to modify this task."
+            );
         }
 
         taskRepository.delete(task);
+    }
+
+    private LocalTime toLocalTime(int hour, int minute) {
+        try {
+            return LocalTime.of(hour, minute);
+        } catch (DateTimeException exception) {
+            throw ApiException.badRequest(
+                "INVALID_TASK_TIME",
+                "A task time is invalid."
+            );
+        }
+    }
+
+    private DayOfWeek toDayOfWeek(int dayOfWeek) {
+        if (dayOfWeek < 0 || dayOfWeek > 6) {
+            throw ApiException.badRequest(
+                "INVALID_DAY_OF_WEEK",
+                "dayOfWeek must be between 0 and 6."
+            );
+        }
+        return DayOfWeek.values()[dayOfWeek];
     }
 
 }

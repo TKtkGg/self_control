@@ -8,6 +8,7 @@ import com.tktkgg.selfcontrol.dto.request.SettingRequest;
 import com.tktkgg.selfcontrol.dto.response.SettingResponse;
 import com.tktkgg.selfcontrol.repository.SettingRepository;
 import com.tktkgg.selfcontrol.entity.Setting;
+import com.tktkgg.selfcontrol.exception.ApiException;
 
 @Service
 public class SettingService {
@@ -22,14 +23,20 @@ public class SettingService {
     public SettingResponse getSetting() {
         UUID userId = authService.getCurrentUserId();
         Setting setting = settingRepository.findByUserId(userId)
-            .orElseThrow(() -> new RuntimeException("Setting not found"));
+            .orElseThrow(() -> ApiException.internalServerError(
+                "SETTING_NOT_FOUND",
+                "Setting is missing."
+            ));
         return new SettingResponse(setting.getIsPublic(), setting.getIsAuthorizeNotification());
     }
 
     public SettingResponse updateSetting(SettingRequest request) {
         UUID userId = authService.getCurrentUserId();
         Setting setting = settingRepository.findByUserId(userId)
-            .orElseThrow(() -> new RuntimeException("Setting not found"));
+            .orElseThrow(() -> ApiException.internalServerError(
+                "SETTING_NOT_FOUND",
+                "Setting is missing."
+            ));
 
         setting.setIsPublic(request.isPublic());
         setting.setIsAuthorizeNotification(request.isAuthorizeNotification());

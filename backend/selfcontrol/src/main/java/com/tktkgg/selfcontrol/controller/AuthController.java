@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 import com.tktkgg.selfcontrol.dto.request.SignUpRequest;
 import com.tktkgg.selfcontrol.dto.request.LoginRequest;
 import com.tktkgg.selfcontrol.service.AuthService;
@@ -32,13 +34,13 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<Map<String, String>> signUp(@RequestBody SignUpRequest signUpRequest, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Map<String, String>> signUp(@Valid @RequestBody SignUpRequest signUpRequest, HttpServletRequest request, HttpServletResponse response) {
         authService.signUp(signUpRequest.username(), signUpRequest.email(), signUpRequest.password(), signUpRequest.passwordConfirm(), request, response);
         return ResponseEntity.ok(Map.of("message", "User registered successfully"));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
         authService.login(loginRequest.email(), loginRequest.password(), request, response);
         return ResponseEntity.ok(Map.of("message", "User logged in successfully"));
     }

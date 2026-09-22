@@ -3,9 +3,11 @@ package com.tktkgg.selfcontrol.service;
 import org.springframework.stereotype.Service;
 
 import com.tktkgg.selfcontrol.repository.ScheduleRepository;
+import com.tktkgg.selfcontrol.repository.SettingRepository;
 import com.tktkgg.selfcontrol.repository.TaskRepository;
 import com.tktkgg.selfcontrol.dto.response.UserScheduleResponse;
 import com.tktkgg.selfcontrol.entity.Schedule;
+import com.tktkgg.selfcontrol.entity.Setting;
 import com.tktkgg.selfcontrol.entity.Task;
 import com.tktkgg.selfcontrol.dto.response.DayScheduleResponse;
 import com.tktkgg.selfcontrol.dto.response.TaskResponse;
@@ -21,13 +23,30 @@ import com.tktkgg.selfcontrol.exception.ApiException;
 public class UserScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final TaskRepository taskRepository;
+    private final SettingRepository settingRepository;
+    private final AuthService authService;
 
-    public UserScheduleService(ScheduleRepository scheduleRepository, TaskRepository taskRepository) {
+    public UserScheduleService(
+        ScheduleRepository scheduleRepository, 
+        TaskRepository taskRepository,
+        SettingRepository settingRepository,
+        AuthService authService
+    ) {
         this.scheduleRepository = scheduleRepository;
         this.taskRepository = taskRepository;
+        this.settingRepository = settingRepository;
+        this.authService = authService;
     }
 
     public UserScheduleResponse getUserSchedule(UUID userId) {
+        Setting setting = settingRepository.findByUserId(userId).orElseThrow(() -> 
+            ApiException.notFound("SETTING_NOT_FOUND", "Setting is missing")
+        );
+
+        if (!userId.equals(authService.getCurrentUserId()) && setting.getIsPublic() == false) {
+            throw ApiException.forbidden("USER_FORBIDDEN", "CurrentUser is forbidden");
+        }
+        
         List<Schedule> schedules = scheduleRepository.findByUserIdOrderByDayOfWeekAsc(userId);
         if (schedules.isEmpty()) {
             return new UserScheduleResponse(List.of());

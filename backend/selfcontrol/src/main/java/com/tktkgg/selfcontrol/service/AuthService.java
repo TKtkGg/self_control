@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
@@ -37,22 +38,34 @@ public class AuthService {
     private final ProfileRepository profileRepository;
     private final SettingRepository settingRepository;
     private final PasswordEncoder passwordEncoder;
+    private CsrfTokenRepository csrfTokenRepository;
 
     public AuthService(
         UserRepository userRepository, 
         ScheduleRepository scheduleRepository, 
         ProfileRepository profileRepository, 
         SettingRepository settingRepository,
-        PasswordEncoder passwordEncoder
+        PasswordEncoder passwordEncoder,
+        CsrfTokenRepository csrfTokenRepository
     ) {
         this.userRepository = userRepository;
         this.scheduleRepository = scheduleRepository;
         this.profileRepository = profileRepository;
         this.settingRepository = settingRepository;
         this.passwordEncoder = passwordEncoder;
+        this.csrfTokenRepository = csrfTokenRepository;
     }
 
-    private void establishSession(User user, HttpServletRequest request, HttpServletResponse response) {
+    private void establishSession(
+        User user,
+        HttpServletRequest request, 
+        HttpServletResponse response
+    ) {
+        // 既存セッションがある場合だけIDを更新
+        if (request.getSession(false) != null) {
+            request.changeSessionId();
+        }
+
         UsernamePasswordAuthenticationToken authentication = 
             new UsernamePasswordAuthenticationToken(
                 user.getId(),
@@ -64,8 +77,12 @@ public class AuthService {
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
 
-        SecurityContextRepository repository = new HttpSessionSecurityContextRepository();
+        SecurityContextRepository repository = 
+            new HttpSessionSecurityContextRepository();
         repository.saveContext(context, request, response);
+
+        // ログイン前に使用していたCSRFトークンを破棄
+        csrfTokenRepository.saveToken(null, request, response);
     }
 
     public boolean isAuthenticated() {

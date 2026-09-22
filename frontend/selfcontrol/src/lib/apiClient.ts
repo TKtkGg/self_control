@@ -1,3 +1,65 @@
+type CsrfTokenResponse = {
+    headerName: string;
+    token: string;
+};
+
+let csrfToken: CsrfTokenResponse | null = null;
+let csrfTokenRequest: Promise<void> | null = null;
+
+export const refreshCsrfToken = async () => {
+    const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`,
+        {
+            method: "GET",
+            credentials: "include",
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("CSRFトークンを取得できませんでした。")
+    }
+
+    csrfToken = await response.json();
+}
+
+const ensureCsrfToken = async () => {
+    if (csrfToken) return;
+
+    if (!csrfTokenRequest) {
+        csrfTokenRequest = refreshCsrfToken().finally(() => {
+            csrfTokenRequest = null;
+        });
+    }
+
+    await csrfTokenRequest;
+}
+
+const getMutationHeaders = async () => {
+    await ensureCsrfToken();
+
+    if (!csrfToken) {
+        throw new Error("CSRFトークンを先に取得してください。");
+    }
+
+    return {
+        "Content-Type": "application/json",
+        [csrfToken.headerName]: csrfToken.token,
+    };
+}
+
+export const apiAuthPost = async (
+    path: string,
+    body?: Record<string, unknown>
+) => {
+    await refreshCsrfToken();
+
+    const result = await apiPost(path, body);
+
+    await refreshCsrfToken();
+
+    return result;
+}
+
 const handleError = async (response: Response): Promise<never> => {
     const error = await response.json().catch(() => null) as {
         detail?: unknown;
@@ -53,9 +115,7 @@ export const apiPost = async(path: string, body?: Record<string, unknown>) => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, {
         method: "POST",
         credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: await getMutationHeaders(),
         body: body ? JSON.stringify(body) : undefined,
     });
     if(!response.ok) {
@@ -68,9 +128,7 @@ export const apiPatch = async(path: string, body?: Record<string, unknown>) => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, {
         method: "PATCH",
         credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: await getMutationHeaders(),
         body: body ? JSON.stringify(body) : undefined,
     });
 
@@ -84,9 +142,7 @@ export const apiDelete = async(path: string) => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, {
         method: "DELETE",
         credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: await getMutationHeaders(),
     });
 
     if(!response.ok) {

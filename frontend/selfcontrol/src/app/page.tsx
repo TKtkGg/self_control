@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { apiPost, apiGet } from "@/lib/apiClient";
+import { apiAuthPost, apiGet } from "@/lib/apiClient";
 import { useState, useEffect } from "react";
 
 export default function HomePage() {
@@ -24,7 +24,7 @@ export default function HomePage() {
 
   const handleLogout = async () => {
     try {
-      await apiPost("/api/auth/logout");
+      await apiAuthPost("/api/auth/logout");
       setSuccess("ログアウトに成功しました");
       setAuthenticated(false);
     } catch (error: unknown) {

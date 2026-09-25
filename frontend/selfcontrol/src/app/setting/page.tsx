@@ -8,14 +8,14 @@ export default function SettingPage() {
     const [isAuthorizeNotification, setIsAuthorizeNotification] = useState(false);
 
     useEffect(() => {
-        apiGet("/api/setting").then((res) => {
+        apiGet("/api/settings").then((res) => {
             setIsPublic(res.isPublic);
             setIsAuthorizeNotification(res.isAuthorizeNotification);
         });
     }, [])
 
     const handleSubmit = () => {
-        apiPatch("/api/setting", { isPublic, isAuthorizeNotification }).then((res) => {
+        apiPatch("/api/settings", { isPublic, isAuthorizeNotification }).then((res) => {
             setIsPublic(res.isPublic);
             setIsAuthorizeNotification(res.isAuthorizeNotification);
         });

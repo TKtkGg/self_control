@@ -4,35 +4,32 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Map;
-import java.util.UUID;
 
 import com.tktkgg.selfcontrol.service.AuthService;
-import com.tktkgg.selfcontrol.service.TaskService;
 import com.tktkgg.selfcontrol.service.ScheduleService;
 import com.tktkgg.selfcontrol.service.UserScheduleService;
 import com.tktkgg.selfcontrol.dto.response.DayScheduleResponse;
 import com.tktkgg.selfcontrol.dto.response.UserScheduleResponse;
-import com.tktkgg.selfcontrol.dto.request.TaskRequest;
-import com.tktkgg.selfcontrol.dto.request.UpdateTaskRequest;
+import com.tktkgg.selfcontrol.dto.request.UpdateScheduleRequest;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 @RestController
-@RequestMapping("/api/schedule")
+@RequestMapping("/api/schedules")
 public class ScheduleController {
     private final AuthService authService;
-    private final TaskService taskService;
     private final ScheduleService scheduleService;
     private final UserScheduleService userScheduleService;
 
-    public ScheduleController(AuthService authService, TaskService taskService, ScheduleService scheduleService, UserScheduleService userScheduleService) {
+    public ScheduleController(AuthService authService, ScheduleService scheduleService, UserScheduleService userScheduleService) {
         this.authService = authService;
-        this.taskService = taskService;
         this.scheduleService = scheduleService;
         this.userScheduleService = userScheduleService;
     }
@@ -43,50 +40,18 @@ public class ScheduleController {
     }
 
     @GetMapping("/{dayOfWeek}")
-    public DayScheduleResponse getSpecificSchedule(@PathVariable int dayOfWeek) {
+    public DayScheduleResponse getSpecificSchedule(
+        @PathVariable @Min(0) @Max(6) int dayOfWeek
+    ) {
         return userScheduleService.getUserSpecificSchedule(authService.getCurrentUserId(), dayOfWeek);
     }
 
     @PatchMapping("/{dayOfWeek}")
     public ResponseEntity<Map<String, String>> updateScheduleTitle(
-        @PathVariable int dayOfWeek,
-        @RequestBody Map<String, String> request
+        @PathVariable @Min(0) @Max(6) int dayOfWeek,
+        @Valid @RequestBody UpdateScheduleRequest request
     ) {
-        scheduleService.updateTitle(dayOfWeek, request.get("title"));
+        scheduleService.updateTitle(dayOfWeek, request.title());
         return ResponseEntity.ok(Map.of("message", "Schedule updated successfully"));
-    }
-
-    @PostMapping("/task")
-    public ResponseEntity<Map<String, String>> createTask(@RequestBody TaskRequest request) {
-        taskService.createTask(
-            request.dayOfWeek(), 
-            request.startHour(),
-            request.startMinute(), 
-            request.endHour(), 
-            request.endMinute(), 
-            request.name()
-        );
-
-        return ResponseEntity.ok(Map.of("message", "Task created successfully"));
-    }
-    
-    @PatchMapping("/task/{taskId}")
-    public ResponseEntity<Map<String, String>> updateTask(@PathVariable UUID taskId, @RequestBody UpdateTaskRequest request) {
-        taskService.updateTask(
-            taskId, 
-            request.startHour(),
-            request.startMinute(), 
-            request.endHour(),
-            request.endMinute(), 
-            request.name()
-        );
-
-        return ResponseEntity.ok(Map.of("message", "Task updated successfully"));
-    }
-
-    @DeleteMapping("/task/{taskId}")
-    public ResponseEntity<Map<String, String>> deleteTask(@PathVariable UUID taskId) {
-        taskService.deleteTask(taskId);
-        return ResponseEntity.ok(Map.of("message", "Task deleted successfully"));
     }
 }

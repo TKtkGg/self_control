@@ -19,6 +19,7 @@ import com.tktkgg.selfcontrol.repository.SettingRepository;
 import com.tktkgg.selfcontrol.dto.response.UserResponse;
 import com.tktkgg.selfcontrol.dto.response.UsersResponse;
 import com.tktkgg.selfcontrol.dto.response.LikeCountResponse;
+import com.tktkgg.selfcontrol.exception.ApiException;
 
 @Service
 public class UserService {
@@ -35,6 +36,13 @@ public class UserService {
     }
 
     public UsersResponse getUsers(int page, int size, String username) {
+        if (page < 0 || size < 1 || size > 100) {
+            throw ApiException.badRequest(
+                "INVALID_PAGINATION",
+                "page must be 0 or greater and size must be between 1 and 100."
+            );
+        }
+
         Pageable pageable = PageRequest.of(page, size);
         Page<User> users;
 
@@ -52,7 +60,10 @@ public class UserService {
                 new UserResponse(user.getId(), user.getUsername())
             ).filter(user -> !user.id().equals(authService.getCurrentUserId())
             ).filter(user -> settingRepository.findByUserId(user.id()).
-                                orElseThrow(() -> new RuntimeException("User's setting not found"))
+                                orElseThrow(() -> ApiException.internalServerError(
+                                    "SETTING_NOT_FOUND",
+                                    "User setting is missing."
+                                ))
                                 .getIsPublic() == true)
             .collect(Collectors.toList());
 
@@ -62,11 +73,19 @@ public class UserService {
     public LikeCountResponse likeUser(UUID currentUserId, UUID targetUserId) {
         Optional<Like> existingLike = likeRepository.findByUserIdAndTargetUserId(currentUserId, targetUserId);
         if (existingLike.isPresent()) {
-            throw new RuntimeException("Already liked");
+            throw ApiException.badRequest("ALREADY_LIKED", "The user is already liked.");
         }
 
-        User currentUser = userRepository.findById(currentUserId).orElseThrow(() -> new RuntimeException("User not found"));
-        User targetUser = userRepository.findById(targetUserId).orElseThrow(() -> new RuntimeException("User not found"));
+        if (currentUserId.equals(targetUserId)) {
+            throw ApiException.forbidden("SELF_LIKE_NOT_ALLOWED", "You cannot like yourself.");
+        }
+
+        User currentUser = userRepository.findById(currentUserId).orElseThrow(() ->
+            ApiException.notFound("USER_NOT_FOUND", "User not found.")
+        );
+        User targetUser = userRepository.findById(targetUserId).orElseThrow(() ->
+            ApiException.notFound("USER_NOT_FOUND", "User not found.")
+        );
 
         Like like = new Like();
         like.setUser(currentUser);
@@ -80,7 +99,7 @@ public class UserService {
     public LikeCountResponse unlikeUser(UUID currentUserId, UUID targetUserId) {
         Optional<Like> existingLike = likeRepository.findByUserIdAndTargetUserId(currentUserId, targetUserId);
         if (!existingLike.isPresent()) {
-            throw new RuntimeException("Not liked");
+            throw ApiException.badRequest("LIKE_NOT_FOUND", "The user has not been liked.");
         }
 
         likeRepository.delete(existingLike.get());

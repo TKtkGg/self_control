@@ -10,7 +10,7 @@ export default function ProfilePage() {
     const [iconSrc, setIconSrc] = useState<string | undefined>(undefined);
 
     useEffect(() => {
-        apiGet(`/api/setting/profile`).then((data) => {
+        apiGet(`/api/profile`).then((data) => {
             setUsername(data.username);
             setSelfIntroduce(data.selfIntroduce);
             setIcon(data.icon ?? "");
@@ -20,7 +20,7 @@ export default function ProfilePage() {
     }, []);
 
     const handleUpdate = () => {
-        apiPatch(`/api/setting/profile`, { username, selfIntroduce, icon }).then((data) => {
+        apiPatch(`/api/profile`, { username, selfIntroduce, icon }).then((data) => {
             setUsername(data.username);
             setSelfIntroduce(data.selfIntroduce);
             setIcon(data.icon ?? "");

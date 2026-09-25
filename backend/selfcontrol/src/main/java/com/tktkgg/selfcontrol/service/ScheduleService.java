@@ -6,6 +6,7 @@ import com.tktkgg.selfcontrol.entity.Schedule;
 import java.time.DayOfWeek;
 
 import org.springframework.stereotype.Service;
+import com.tktkgg.selfcontrol.exception.ApiException;
 
 @Service
 public class ScheduleService {
@@ -19,16 +20,29 @@ public class ScheduleService {
 
     public void updateTitle(int dayOfWeek, String title) {
         Schedule schedule = scheduleRepository.findByUserIdAndDayOfWeek(
-            authService.getCurrentUserId(), DayOfWeek.values()[dayOfWeek]
+            authService.getCurrentUserId(), toDayOfWeek(dayOfWeek)
         ).orElseThrow(() -> 
-            new IllegalArgumentException("Schedule not found")
+            ApiException.notFound("SCHEDULE_NOT_FOUND", "Schedule not found.")
         );
 
-        if (title.length() > 30) {
-            throw new IllegalArgumentException("Title must be less than 30 characters");
+        if (title == null || title.length() > 30) {
+            throw ApiException.badRequest(
+                "INVALID_SCHEDULE_TITLE",
+                "Title must be 30 characters or fewer."
+            );
         }
 
         schedule.setTitle(title);
         scheduleRepository.save(schedule);
+    }
+
+    private DayOfWeek toDayOfWeek(int dayOfWeek) {
+        if (dayOfWeek < 0 || dayOfWeek > 6) {
+            throw ApiException.badRequest(
+                "INVALID_DAY_OF_WEEK",
+                "dayOfWeek must be between 0 and 6."
+            );
+        }
+        return DayOfWeek.values()[dayOfWeek];
     }
 }

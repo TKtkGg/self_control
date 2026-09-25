@@ -1,6 +1,11 @@
 package com.tktkgg.selfcontrol.dto.request;
 
+import jakarta.validation.constraints.NotNull;
+
 public record SettingRequest(
-    boolean isPublic,
-    boolean isAuthorizeNotification
+    @NotNull
+    Boolean isPublic,
+
+    @NotNull
+    Boolean isAuthorizeNotification
 ) {}

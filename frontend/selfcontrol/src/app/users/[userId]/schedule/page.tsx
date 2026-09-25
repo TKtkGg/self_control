@@ -24,7 +24,7 @@ export default function UserSchedulePage({ params }: Props) {
         });
 
         const fetchUser = async () => {
-            const response = await apiGet("/api/auth/user");
+            const response = await apiGet("/api/auth/status");
             if (!response.authenticated) {
                 router.push("/");
             }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { apiPost } from "@/lib/apiClient";
+import { apiAuthPost } from "@/lib/apiClient";
 import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
@@ -15,7 +15,7 @@ export default function SignUpPage() {
 
     const handleSubmit = async () => {
         try {
-            await apiPost("/api/auth/signup", {
+            await apiAuthPost("/api/auth/signup", {
                 username,
                 email,
                 password,

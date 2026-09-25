@@ -7,8 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.tktkgg.selfcontrol.dto.response.SettingResponse;
+import com.tktkgg.selfcontrol.service.user.SettingService;
 import com.tktkgg.selfcontrol.dto.request.SettingRequest;
-import com.tktkgg.selfcontrol.service.SettingService;
+
 import jakarta.validation.Valid;
 
 @RestController

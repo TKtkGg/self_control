@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Map;
 
-import com.tktkgg.selfcontrol.service.AuthService;
-import com.tktkgg.selfcontrol.service.ScheduleService;
-import com.tktkgg.selfcontrol.service.UserScheduleService;
+import com.tktkgg.selfcontrol.service.auth.AuthService;
+import com.tktkgg.selfcontrol.service.schedule.ScheduleService;
+import com.tktkgg.selfcontrol.service.schedule.UserScheduleService;
 import com.tktkgg.selfcontrol.dto.response.DayScheduleResponse;
 import com.tktkgg.selfcontrol.dto.response.UserScheduleResponse;
 import com.tktkgg.selfcontrol.dto.request.UpdateScheduleRequest;

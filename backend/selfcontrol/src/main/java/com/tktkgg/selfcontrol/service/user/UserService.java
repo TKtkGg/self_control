@@ -1,4 +1,4 @@
-package com.tktkgg.selfcontrol.service;
+package com.tktkgg.selfcontrol.service.user;
 
 import java.util.UUID;
 import java.util.List;
@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.tktkgg.selfcontrol.repository.UserRepository;
+import com.tktkgg.selfcontrol.service.auth.AuthService;
 import com.tktkgg.selfcontrol.entity.User;
 import com.tktkgg.selfcontrol.entity.Like;
 import com.tktkgg.selfcontrol.repository.LikeRepository;

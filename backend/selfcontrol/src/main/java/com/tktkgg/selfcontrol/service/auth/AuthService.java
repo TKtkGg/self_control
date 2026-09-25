@@ -1,4 +1,4 @@
-package com.tktkgg.selfcontrol.service;
+package com.tktkgg.selfcontrol.service.auth;
 
 import java.util.Optional;
 import java.util.List;

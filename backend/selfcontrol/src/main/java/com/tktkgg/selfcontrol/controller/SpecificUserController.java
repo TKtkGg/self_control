@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tktkgg.selfcontrol.service.AuthService;
-import com.tktkgg.selfcontrol.service.UserService;
-import com.tktkgg.selfcontrol.service.ProfileService;
+import com.tktkgg.selfcontrol.service.auth.AuthService;
+import com.tktkgg.selfcontrol.service.schedule.UserScheduleService;
+import com.tktkgg.selfcontrol.service.user.ProfileService;
+import com.tktkgg.selfcontrol.service.user.UserService;
 import com.tktkgg.selfcontrol.dto.response.ProfileResponse;
 import com.tktkgg.selfcontrol.dto.response.LikeCountResponse;
-import com.tktkgg.selfcontrol.service.UserScheduleService;
 import com.tktkgg.selfcontrol.dto.response.UserScheduleResponse;
 
 @RestController

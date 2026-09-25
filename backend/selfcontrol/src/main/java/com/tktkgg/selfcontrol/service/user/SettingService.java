@@ -1,4 +1,4 @@
-package com.tktkgg.selfcontrol.service;
+package com.tktkgg.selfcontrol.service.user;
 
 import java.util.UUID;
 
@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.tktkgg.selfcontrol.dto.request.SettingRequest;
 import com.tktkgg.selfcontrol.dto.response.SettingResponse;
 import com.tktkgg.selfcontrol.repository.SettingRepository;
+import com.tktkgg.selfcontrol.service.auth.AuthService;
 import com.tktkgg.selfcontrol.entity.Setting;
 import com.tktkgg.selfcontrol.exception.ApiException;
 

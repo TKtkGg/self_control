@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 
 import com.tktkgg.selfcontrol.dto.request.SignUpRequest;
+import com.tktkgg.selfcontrol.service.auth.AuthService;
 import com.tktkgg.selfcontrol.dto.request.LoginRequest;
-import com.tktkgg.selfcontrol.service.AuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

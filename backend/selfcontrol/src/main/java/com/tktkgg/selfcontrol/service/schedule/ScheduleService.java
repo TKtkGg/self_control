@@ -1,6 +1,7 @@
-package com.tktkgg.selfcontrol.service;
+package com.tktkgg.selfcontrol.service.schedule;
 
 import com.tktkgg.selfcontrol.repository.ScheduleRepository;
+import com.tktkgg.selfcontrol.service.auth.AuthService;
 import com.tktkgg.selfcontrol.entity.Schedule;
 
 import java.time.DayOfWeek;

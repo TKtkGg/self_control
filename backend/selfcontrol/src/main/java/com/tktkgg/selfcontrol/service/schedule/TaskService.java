@@ -1,4 +1,4 @@
-package com.tktkgg.selfcontrol.service;
+package com.tktkgg.selfcontrol.service.schedule;
 
 import java.time.LocalTime;
 import java.time.DayOfWeek;
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.tktkgg.selfcontrol.entity.Task;
 import com.tktkgg.selfcontrol.repository.TaskRepository;
+import com.tktkgg.selfcontrol.service.auth.AuthService;
 import com.tktkgg.selfcontrol.repository.ScheduleRepository;
 import com.tktkgg.selfcontrol.entity.Schedule;
 import com.tktkgg.selfcontrol.exception.ApiException;

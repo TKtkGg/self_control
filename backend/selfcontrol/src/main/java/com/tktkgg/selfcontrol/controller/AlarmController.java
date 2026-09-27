@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tktkgg.selfcontrol.dto.response.AlarmResponse;
-import com.tktkgg.selfcontrol.service.AlarmService;
+import com.tktkgg.selfcontrol.service.alarm.AlarmService;
 
 @RestController
 @RequestMapping("/api/alarm") 

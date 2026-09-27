@@ -1,4 +1,4 @@
-package com.tktkgg.selfcontrol.service;
+package com.tktkgg.selfcontrol.service.alarm;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -13,6 +13,7 @@ import com.tktkgg.selfcontrol.entity.Schedule;
 import com.tktkgg.selfcontrol.entity.Task;
 import com.tktkgg.selfcontrol.repository.ScheduleRepository;
 import com.tktkgg.selfcontrol.repository.TaskRepository;
+import com.tktkgg.selfcontrol.service.auth.AuthService;
 
 @Service 
 public class AlarmService {

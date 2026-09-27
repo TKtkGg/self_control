@@ -1,8 +1,9 @@
-package com.tktkgg.selfcontrol.service;
+package com.tktkgg.selfcontrol.service.user;
 
 import org.springframework.stereotype.Service;
 
 import com.tktkgg.selfcontrol.repository.UserRepository;
+import com.tktkgg.selfcontrol.service.auth.AuthService;
 import com.tktkgg.selfcontrol.repository.ProfileRepository;
 import com.tktkgg.selfcontrol.repository.SettingRepository;
 import com.tktkgg.selfcontrol.entity.Profile;

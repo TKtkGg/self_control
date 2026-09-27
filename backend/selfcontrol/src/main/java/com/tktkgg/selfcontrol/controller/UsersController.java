@@ -6,7 +6,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.tktkgg.selfcontrol.dto.response.UsersResponse;
-import com.tktkgg.selfcontrol.service.UserService;
+import com.tktkgg.selfcontrol.service.user.UserService;
+
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 

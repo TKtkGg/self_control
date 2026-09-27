@@ -9,8 +9,8 @@ import jakarta.validation.Valid;
 
 import com.tktkgg.selfcontrol.dto.response.ProfileResponse;
 import com.tktkgg.selfcontrol.dto.request.UpdateProfileRequest;
-import com.tktkgg.selfcontrol.service.AuthService;
-import com.tktkgg.selfcontrol.service.ProfileService;
+import com.tktkgg.selfcontrol.service.auth.AuthService;
+import com.tktkgg.selfcontrol.service.user.ProfileService;
 
 @RestController
 @RequestMapping("/api/profile")

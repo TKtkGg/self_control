@@ -1,9 +1,10 @@
-package com.tktkgg.selfcontrol.service;
+package com.tktkgg.selfcontrol.service.auth;
 
 import java.util.Optional;
 import java.util.List;
 import java.time.DayOfWeek;
 import java.util.UUID;
+import java.util.Locale;
 
 import org.springframework.stereotype.Service;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,7 +39,8 @@ public class AuthService {
     private final ProfileRepository profileRepository;
     private final SettingRepository settingRepository;
     private final PasswordEncoder passwordEncoder;
-    private CsrfTokenRepository csrfTokenRepository;
+    private final CsrfTokenRepository csrfTokenRepository;
+    private final LoginRateLimitService loginRateLimitService;
 
     public AuthService(
         UserRepository userRepository, 
@@ -46,7 +48,8 @@ public class AuthService {
         ProfileRepository profileRepository, 
         SettingRepository settingRepository,
         PasswordEncoder passwordEncoder,
-        CsrfTokenRepository csrfTokenRepository
+        CsrfTokenRepository csrfTokenRepository,
+        LoginRateLimitService loginRateLimitService
     ) {
         this.userRepository = userRepository;
         this.scheduleRepository = scheduleRepository;
@@ -54,6 +57,7 @@ public class AuthService {
         this.settingRepository = settingRepository;
         this.passwordEncoder = passwordEncoder;
         this.csrfTokenRepository = csrfTokenRepository;
+        this.loginRateLimitService = loginRateLimitService;
     }
 
     private void establishSession(
@@ -86,7 +90,8 @@ public class AuthService {
     }
 
     public boolean isAuthenticated() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = 
+            SecurityContextHolder.getContext().getAuthentication();
         
         return authentication != null 
             && authentication.isAuthenticated()
@@ -94,18 +99,31 @@ public class AuthService {
     }
 
     public UUID getCurrentUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+        Authentication authentication = 
+            SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null 
+            || !authentication.isAuthenticated() 
+            || authentication instanceof AnonymousAuthenticationToken
+        ) {
             throw ApiException.unauthorized(
                 "AUTHENTICATION_REQUIRED",
                 "Authentication is required."
             );
         }
+
         return (UUID) authentication.getPrincipal();
     }
 
     @Transactional
-    public void signUp(String username, String email, String password, String passwordConfirm, HttpServletRequest request, HttpServletResponse response) {
+    public void signUp(
+        String username, 
+        String email, 
+        String password, 
+        String passwordConfirm, 
+        HttpServletRequest request, 
+        HttpServletResponse response
+    ) {
         if (!java.util.Objects.equals(password, passwordConfirm)) {
             throw ApiException.badRequest(
                 "PASSWORD_CONFIRMATION_MISMATCH",
@@ -149,16 +167,28 @@ public class AuthService {
         establishSession(user, request, response);
     }
 
-    public void login(String email, String password, HttpServletRequest request, HttpServletResponse response) {
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) {
-            throw ApiException.unauthorized(
-                "INVALID_CREDENTIALS",
-                "Email or password is invalid."
-            );
-        }
+    public void login(
+        String email, 
+        String password, 
+        HttpServletRequest request, 
+        HttpServletResponse response
+    ) {
+        String accountKey = email.trim().toLowerCase(Locale.ROOT);
 
-        if (!passwordEncoder.matches(password, user.get().getPasswordHash())) {
+        String ipAddress = request.getRemoteAddr();
+
+        loginRateLimitService.checkIp(ipAddress);
+
+        loginRateLimitService.checkAccount(accountKey);
+
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if (
+            user.isEmpty()
+            || !passwordEncoder.matches(password, user.get().getPasswordHash())
+        ) {
+            loginRateLimitService.recordAccountFailure(accountKey);
+
             throw ApiException.unauthorized(
                 "INVALID_CREDENTIALS",
                 "Email or password is invalid."
@@ -166,6 +196,8 @@ public class AuthService {
         }
 
         establishSession(user.get(), request, response);
+
+        loginRateLimitService.resetAccount(accountKey);
     }
 
     public void logout(HttpServletRequest request, HttpServletResponse response) {

@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.Map;
 import java.util.UUID;
 
-import com.tktkgg.selfcontrol.service.TaskService;
 import com.tktkgg.selfcontrol.dto.request.TaskRequest;
 import com.tktkgg.selfcontrol.dto.request.UpdateTaskRequest;
+import com.tktkgg.selfcontrol.service.schedule.TaskService;
+
 import jakarta.validation.Valid;
 
 @RestController

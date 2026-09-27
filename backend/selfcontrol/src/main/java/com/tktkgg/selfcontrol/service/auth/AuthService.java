@@ -39,8 +39,8 @@ public class AuthService {
     private final ProfileRepository profileRepository;
     private final SettingRepository settingRepository;
     private final PasswordEncoder passwordEncoder;
-    private CsrfTokenRepository csrfTokenRepository;
-    private LoginRateLimitService loginRateLimitService;
+    private final CsrfTokenRepository csrfTokenRepository;
+    private final LoginRateLimitService loginRateLimitService;
 
     public AuthService(
         UserRepository userRepository, 

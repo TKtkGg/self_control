@@ -64,7 +64,7 @@ public class LoginRateLimitService {
         rejectIfBlocked(blockedUntil);
     }
 
-    public void resetAccountFailure(String accountKey) {
+    public void recordAccountFailure(String accountKey) {
         String key = "account:" + accountKey;
 
         getState(key).recordFailure(ACCOUNT_POLICY, clock.instant());

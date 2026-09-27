@@ -81,6 +81,34 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return toResponse(problemDetail, new HttpHeaders(), exception.getStatus());
     }
 
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<Object> handleRateLimitExceeded(
+        RateLimitExceededException exception,
+        HttpServletRequest request
+    ) {
+        ProblemDetail problemDetail =
+            problemDetailFactory.create(
+                HttpStatus.TOO_MANY_REQUESTS,
+                "LOGIN_RATE_LIMITED",
+                "Too many login attempts. Please try again later.",
+                request
+            );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(
+            "Retry-After",
+            String.valueOf(
+                exception.getRetryAfterSeconds()
+            )
+        );
+
+        return toResponse(
+            problemDetail,
+            headers,
+            HttpStatus.TOO_MANY_REQUESTS
+        );
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleDataIntegrityViolation(
         DataIntegrityViolationException exception,

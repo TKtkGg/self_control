@@ -85,7 +85,7 @@ public class ProfileService {
             ApiException.internalServerError("PROFILE_NOT_FOUND", "Profile is missing.")
         );
 
-        if (userId.equals(authService.getCurrentUserId())) {
+        if (!userId.equals(authService.getCurrentUserId())) {
             Setting setting = settingRepository.findByUserId(userId).orElseThrow(() -> 
                 ApiException.notFound("SETTING_NOT_FOUND", "Setting is missing")
             );

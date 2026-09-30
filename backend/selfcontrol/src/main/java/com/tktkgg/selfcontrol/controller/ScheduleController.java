@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.Map;
 import java.util.UUID;
 
-import com.tktkgg.selfcontrol.service.auth.AuthService;
 import com.tktkgg.selfcontrol.service.schedule.ScheduleService;
 import com.tktkgg.selfcontrol.service.schedule.UserScheduleService;
 import com.tktkgg.selfcontrol.dto.response.DayScheduleResponse;
@@ -25,31 +24,29 @@ import jakarta.validation.constraints.Min;
 @RestController
 @RequestMapping("/api")
 public class ScheduleController {
-    private final AuthService authService;
     private final ScheduleService scheduleService;
     private final UserScheduleService userScheduleService;
 
-    public ScheduleController(AuthService authService, ScheduleService scheduleService, UserScheduleService userScheduleService) {
-        this.authService = authService;
+    public ScheduleController(ScheduleService scheduleService, UserScheduleService userScheduleService) {
         this.scheduleService = scheduleService;
         this.userScheduleService = userScheduleService;
     }
 
     @GetMapping("/schedules")
     public UserScheduleResponse getSchedules() {
-        return userScheduleService.getUserSchedule(authService.getCurrentUserId());
+        return userScheduleService.getMySchedule();
     }
 
     @GetMapping("/users/{userId}/schedule")
     public UserScheduleResponse getUserSchedule(@PathVariable UUID userId) {
-        return userScheduleService.getUserSchedule(userId);
+        return userScheduleService.getOtherUserSchedule(userId);
     }
 
     @GetMapping("/schedules/{dayOfWeek}")
     public DayScheduleResponse getSpecificSchedule(
         @PathVariable @Min(0) @Max(6) int dayOfWeek
     ) {
-        return userScheduleService.getUserSpecificSchedule(authService.getCurrentUserId(), dayOfWeek);
+        return userScheduleService.getUserSpecificSchedule(dayOfWeek);
     }
 
     @PatchMapping("/schedules/{dayOfWeek}")

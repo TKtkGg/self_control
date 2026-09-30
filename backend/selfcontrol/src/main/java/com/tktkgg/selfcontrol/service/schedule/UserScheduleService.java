@@ -39,13 +39,25 @@ public class UserScheduleService {
         this.authService = authService;
     }
 
-    public UserScheduleResponse getUserSchedule(UUID userId) {
-        Setting setting = settingRepository.findByUserId(userId).orElseThrow(() -> 
-            ApiException.notFound("SETTING_NOT_FOUND", "Setting is missing")
-        );
+    public UserScheduleResponse getMySchedule() {
+        UUID currentUserId = authService.getCurrentUserId();
 
-        if (!userId.equals(authService.getCurrentUserId()) && setting.getIsPublic() == false) {
-            throw ApiException.forbidden("USER_FORBIDDEN", "CurrentUser is forbidden");
+        return getUserSchedule(currentUserId);
+    }
+
+    public UserScheduleResponse getOtherUserSchedule(UUID userId) {
+        return getUserSchedule(userId);
+    }
+
+    private UserScheduleResponse getUserSchedule(UUID userId) {
+        if (!userId.equals(authService.getCurrentUserId())) {
+            Setting setting = settingRepository.findByUserId(userId).orElseThrow(() -> 
+                ApiException.notFound("SETTING_NOT_FOUND", "Setting is missing")
+            );
+
+            if (!userId.equals(authService.getCurrentUserId()) && setting.getIsPublic() == false) {
+                throw ApiException.forbidden("USER_FORBIDDEN", "CurrentUser is forbidden");
+            }
         }
         
         List<Schedule> schedules = scheduleRepository.findByUserIdOrderByDayOfWeekAsc(userId);
@@ -72,9 +84,11 @@ public class UserScheduleService {
         return new UserScheduleResponse(dayScheduleResponses);
     }
 
-    public DayScheduleResponse getUserSpecificSchedule(UUID userID, int dayOfWeek) {
+    public DayScheduleResponse getUserSpecificSchedule(int dayOfWeek) {
+        UUID userId = authService.getCurrentUserId();
+
         Schedule schedule = scheduleRepository.findByUserIdAndDayOfWeek(
-            userID, toDayOfWeek(dayOfWeek)
+            userId, toDayOfWeek(dayOfWeek)
         ).orElseThrow(() -> 
             ApiException.notFound("SCHEDULE_NOT_FOUND", "Schedule not found.")
         );

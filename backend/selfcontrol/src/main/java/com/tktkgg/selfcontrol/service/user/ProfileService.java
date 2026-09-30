@@ -21,21 +21,22 @@ public class ProfileService {
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
     private final LikeRepository likeRepository;
-    private final SettingRepository settingRepository;
     private final AuthService authService;
+    private final UserAccessService userAccessService;
 
     public ProfileService(
         UserRepository userRepository,
         ProfileRepository profileRepository, 
         LikeRepository likeRepository,
-        SettingRepository settingRepository,
-        AuthService authService
+        AuthService authService,
+        UserAccessService userAccessService
+
     ) {
         this.userRepository = userRepository;
         this.profileRepository = profileRepository;
         this.likeRepository = likeRepository;
-        this.settingRepository = settingRepository;
         this.authService = authService;
+        this.userAccessService = userAccessService;
     }
 
     public ProfileResponse getMyProfile() {
@@ -85,15 +86,7 @@ public class ProfileService {
             ApiException.internalServerError("PROFILE_NOT_FOUND", "Profile is missing.")
         );
 
-        if (!userId.equals(authService.getCurrentUserId())) {
-            Setting setting = settingRepository.findByUserId(userId).orElseThrow(() -> 
-                ApiException.notFound("SETTING_NOT_FOUND", "Setting is missing")
-            );
-
-            if (setting.getIsPublic() == false) {
-                throw ApiException.forbidden("USER_FORBIDDEN", "CurrentUser is forbidden");
-            }
-        }
+        userAccessService.requireCanViewUser(userId);
         
         Boolean isLiked = getIsLiked(userId);
 

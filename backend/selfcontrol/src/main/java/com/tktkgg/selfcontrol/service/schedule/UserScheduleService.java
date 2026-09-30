@@ -6,6 +6,7 @@ import com.tktkgg.selfcontrol.repository.ScheduleRepository;
 import com.tktkgg.selfcontrol.repository.SettingRepository;
 import com.tktkgg.selfcontrol.repository.TaskRepository;
 import com.tktkgg.selfcontrol.service.auth.AuthService;
+import com.tktkgg.selfcontrol.service.user.UserAccessService;
 import com.tktkgg.selfcontrol.dto.response.UserScheduleResponse;
 import com.tktkgg.selfcontrol.entity.Schedule;
 import com.tktkgg.selfcontrol.entity.Setting;
@@ -26,17 +27,20 @@ public class UserScheduleService {
     private final TaskRepository taskRepository;
     private final SettingRepository settingRepository;
     private final AuthService authService;
+    private final UserAccessService userAccessService;
 
     public UserScheduleService(
         ScheduleRepository scheduleRepository, 
         TaskRepository taskRepository,
         SettingRepository settingRepository,
-        AuthService authService
+        AuthService authService,
+        UserAccessService userAccessService
     ) {
         this.scheduleRepository = scheduleRepository;
         this.taskRepository = taskRepository;
         this.settingRepository = settingRepository;
         this.authService = authService;
+        this.userAccessService = userAccessService;
     }
 
     public UserScheduleResponse getMySchedule() {
@@ -50,15 +54,7 @@ public class UserScheduleService {
     }
 
     private UserScheduleResponse getUserSchedule(UUID userId) {
-        if (!userId.equals(authService.getCurrentUserId())) {
-            Setting setting = settingRepository.findByUserId(userId).orElseThrow(() -> 
-                ApiException.notFound("SETTING_NOT_FOUND", "Setting is missing")
-            );
-
-            if (setting.getIsPublic() == false) {
-                throw ApiException.forbidden("USER_FORBIDDEN", "CurrentUser is forbidden");
-            }
-        }
+        userAccessService.requireCanViewUser(userId);
         
         List<Schedule> schedules = scheduleRepository.findByUserIdOrderByDayOfWeekAsc(userId);
         if (schedules.isEmpty()) {

@@ -82,12 +82,7 @@ public class TaskService  {
             ApiException.notFound("TASK_NOT_FOUND", "Task not found.")
         );
 
-        if (!task.getSchedule().getUser().getId().equals(authService.getCurrentUserId())) {
-            throw ApiException.forbidden(
-                "TASK_ACCESS_DENIED",
-                "You do not have permission to modify this task."
-            );
-        }
+        requireTaskOwner(task);
 
         LocalTime startTime = toLocalTime(startHour, startMinute);
         LocalTime endTime = toLocalTime(endHour, endMinute);
@@ -110,14 +105,18 @@ public class TaskService  {
             ApiException.notFound("TASK_NOT_FOUND", "Task not found.")
         );
 
+        requireTaskOwner(task);
+
+        taskRepository.delete(task);
+    }
+
+    private void requireTaskOwner(Task task) {
         if (!task.getSchedule().getUser().getId().equals(authService.getCurrentUserId())) {
             throw ApiException.forbidden(
                 "TASK_ACCESS_DENIED",
                 "You do not have permission to modify this task."
             );
         }
-
-        taskRepository.delete(task);
     }
 
     private LocalTime toLocalTime(int hour, int minute) {

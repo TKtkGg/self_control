@@ -38,22 +38,63 @@ public class ProfileService {
         this.authService = authService;
     }
 
-    public ProfileResponse getProfile(UUID userId) {
+    public ProfileResponse getMyProfile() {
+        UUID currentUserId = authService.getCurrentUserId();
+
+        return getProfile(currentUserId);
+    }
+
+    public ProfileResponse getUserProfile(UUID targetUserId) {
+        return getProfile(targetUserId);
+    }
+
+    public ProfileResponse updateMyProfile(UpdateProfileRequest request) {
+        UUID currentUserId = authService.getCurrentUserId();
+
+        User user = userRepository.findById(currentUserId).orElseThrow(() ->
+            ApiException.notFound("USER_NOT_FOUND", "User not found.")
+        );
+
+        Profile profile = profileRepository.findByUserId(currentUserId).orElseThrow(() -> 
+            ApiException.internalServerError("PROFILE_NOT_FOUND", "Profile is missing.")
+        );
+
+        user.setUsername(request.username());
+        profile.setIcon(request.icon());
+        profile.setSelfIntroduce(request.selfIntroduce());
+
+        userRepository.save(user);
+        profileRepository.save(profile);
+
+        return new ProfileResponse(
+            currentUserId,
+            user.getUsername(), 
+            profile.getIcon(), 
+            profile.getSelfIntroduce(), 
+            likeRepository.countByTargetUserId(currentUserId),
+            null
+        );
+    }
+
+    private ProfileResponse getProfile(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() ->
             ApiException.notFound("USER_NOT_FOUND", "User not found.")
         );
-        Profile profile = profileRepository.findByUserId(userId);
-        if (profile == null) {
-            throw ApiException.internalServerError("PROFILE_NOT_FOUND", "Profile is missing.");
-        }
-        Setting setting = settingRepository.findByUserId(userId).orElseThrow(() -> 
-            ApiException.notFound("SETTING_NOT_FOUND", "Setting is missing")
+
+        Profile profile = profileRepository.findByUserId(userId).orElseThrow(() -> 
+            ApiException.internalServerError("PROFILE_NOT_FOUND", "Profile is missing.")
         );
 
-        if (!userId.equals(authService.getCurrentUserId()) && setting.getIsPublic() == false) {
-            throw ApiException.forbidden("USER_FORBIDDEN", "CurrentUser is forbidden");
-        }
+        if (userId.equals(authService.getCurrentUserId())) {
+            Setting setting = settingRepository.findByUserId(userId).orElseThrow(() -> 
+                ApiException.notFound("SETTING_NOT_FOUND", "Setting is missing")
+            );
 
+            if (setting.getIsPublic() == false) {
+                throw ApiException.forbidden("USER_FORBIDDEN", "CurrentUser is forbidden");
+            }
+        }
+        
         Boolean isLiked = getIsLiked(userId);
 
         return new ProfileResponse(
@@ -66,36 +107,13 @@ public class ProfileService {
         );
     }
 
-    public ProfileResponse updateProfile(UUID userId, UpdateProfileRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(() ->
-            ApiException.notFound("USER_NOT_FOUND", "User not found.")
-        );
-        Profile profile = profileRepository.findByUserId(userId);
-        if (profile == null) {
-            throw ApiException.internalServerError("PROFILE_NOT_FOUND", "Profile is missing.");
-        }
-
-        user.setUsername(request.username());
-        profile.setIcon(request.icon());
-        profile.setSelfIntroduce(request.selfIntroduce());
-
-        userRepository.save(user);
-        profileRepository.save(profile);
-
-        return new ProfileResponse(userId,
-            user.getUsername(), 
-            profile.getIcon(), 
-            profile.getSelfIntroduce(), 
-            likeRepository.countByTargetUserId(userId),
-            null
-        );
-    }
-
     private Boolean getIsLiked(UUID userId) {
-        if (authService.getCurrentUserId().equals(userId)) {
+        UUID currentUserId = authService.getCurrentUserId();
+
+        if (currentUserId.equals(userId)) {
             return null;
         } else {
-            return likeRepository.findByUserIdAndTargetUserId(authService.getCurrentUserId(), userId).isPresent();
+            return likeRepository.findByUserIdAndTargetUserId(currentUserId, userId).isPresent();
         }
     }
 }

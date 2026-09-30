@@ -39,7 +39,7 @@ public class SpecificUserController {
 
     @GetMapping("/{userId}/profile")
     public ProfileResponse getProfile(@PathVariable UUID userId) {
-        return profileService.getProfile(userId);
+        return profileService.getUserProfile(userId);
     }
 
     @GetMapping("/{userId}/schedule")

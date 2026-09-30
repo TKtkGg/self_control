@@ -55,7 +55,7 @@ public class UserScheduleService {
                 ApiException.notFound("SETTING_NOT_FOUND", "Setting is missing")
             );
 
-            if (!userId.equals(authService.getCurrentUserId()) && setting.getIsPublic() == false) {
+            if (setting.getIsPublic() == false) {
                 throw ApiException.forbidden("USER_FORBIDDEN", "CurrentUser is forbidden");
             }
         }

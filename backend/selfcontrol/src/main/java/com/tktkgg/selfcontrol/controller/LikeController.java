@@ -2,7 +2,6 @@ package com.tktkgg.selfcontrol.controller;
 
 import java.util.UUID;
 
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,41 +9,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tktkgg.selfcontrol.service.auth.AuthService;
-import com.tktkgg.selfcontrol.service.schedule.UserScheduleService;
-import com.tktkgg.selfcontrol.service.user.ProfileService;
 import com.tktkgg.selfcontrol.service.user.UserService;
-import com.tktkgg.selfcontrol.dto.response.ProfileResponse;
 import com.tktkgg.selfcontrol.dto.response.LikeCountResponse;
-import com.tktkgg.selfcontrol.dto.response.UserScheduleResponse;
 
 @RestController
 @RequestMapping("/api/users")
-public class SpecificUserController {
+public class LikeController {
     private final AuthService authService;
     private final UserService userService;
-    private final ProfileService profileService;
-    private final UserScheduleService userScheduleService;
 
-    public SpecificUserController(
+    public LikeController(
         AuthService authService, 
-        UserService userService,
-        ProfileService profileService,
-        UserScheduleService userScheduleService
+        UserService userService
     ) {
         this.authService = authService;
         this.userService = userService;
-        this.profileService = profileService;
-        this.userScheduleService = userScheduleService;
-    }
-
-    @GetMapping("/{userId}/profile")
-    public ProfileResponse getProfile(@PathVariable UUID userId) {
-        return profileService.getUserProfile(userId);
-    }
-
-    @GetMapping("/{userId}/schedule")
-    public UserScheduleResponse getUserSchedule(@PathVariable UUID userId) {
-        return userScheduleService.getUserSchedule(userId);
     }
 
     @PostMapping("/{userId}/like")

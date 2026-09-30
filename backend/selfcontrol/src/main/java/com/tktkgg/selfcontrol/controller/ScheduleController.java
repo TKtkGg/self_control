@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Map;
+import java.util.UUID;
 
 import com.tktkgg.selfcontrol.service.auth.AuthService;
 import com.tktkgg.selfcontrol.service.schedule.ScheduleService;
@@ -22,7 +23,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
 @RestController
-@RequestMapping("/api/schedules")
+@RequestMapping("/api")
 public class ScheduleController {
     private final AuthService authService;
     private final ScheduleService scheduleService;
@@ -34,19 +35,24 @@ public class ScheduleController {
         this.userScheduleService = userScheduleService;
     }
 
-    @GetMapping("")
+    @GetMapping("/schedules")
     public UserScheduleResponse getSchedules() {
         return userScheduleService.getUserSchedule(authService.getCurrentUserId());
     }
 
-    @GetMapping("/{dayOfWeek}")
+    @GetMapping("/users/{userId}/schedule")
+    public UserScheduleResponse getUserSchedule(@PathVariable UUID userId) {
+        return userScheduleService.getUserSchedule(userId);
+    }
+
+    @GetMapping("/schedules/{dayOfWeek}")
     public DayScheduleResponse getSpecificSchedule(
         @PathVariable @Min(0) @Max(6) int dayOfWeek
     ) {
         return userScheduleService.getUserSpecificSchedule(authService.getCurrentUserId(), dayOfWeek);
     }
 
-    @PatchMapping("/{dayOfWeek}")
+    @PatchMapping("/schedules/{dayOfWeek}")
     public ResponseEntity<Map<String, String>> updateScheduleTitle(
         @PathVariable @Min(0) @Max(6) int dayOfWeek,
         @Valid @RequestBody UpdateScheduleRequest request

@@ -41,6 +41,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final CsrfTokenRepository csrfTokenRepository;
     private final LoginRateLimitService loginRateLimitService;
+    private final EmailNormalizer emailNormalizer;
 
     public AuthService(
         UserRepository userRepository, 
@@ -49,7 +50,8 @@ public class AuthService {
         SettingRepository settingRepository,
         PasswordEncoder passwordEncoder,
         CsrfTokenRepository csrfTokenRepository,
-        LoginRateLimitService loginRateLimitService
+        LoginRateLimitService loginRateLimitService,
+        EmailNormalizer emailNormalizer
     ) {
         this.userRepository = userRepository;
         this.scheduleRepository = scheduleRepository;
@@ -58,6 +60,7 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
         this.csrfTokenRepository = csrfTokenRepository;
         this.loginRateLimitService = loginRateLimitService;
+        this.emailNormalizer = emailNormalizer;
     }
 
     private void establishSession(
@@ -131,7 +134,9 @@ public class AuthService {
             );
         }
 
-        if (userRepository.existsByEmail(email)) {
+        String normalizedEmail = emailNormalizer.normalize(email);
+
+        if (userRepository.existsByEmail(normalizedEmail)) {
             throw ApiException.conflict(
                 "EMAIL_ALREADY_IN_USE",
                 "The email address is already in use."
@@ -140,7 +145,7 @@ public class AuthService {
         
         User user = new User();
         user.setUsername(username);
-        user.setEmail(email);
+        user.setEmail(normalizedEmail);
         user.setPasswordHash(passwordEncoder.encode(password));
         userRepository.save(user);
 
@@ -173,7 +178,7 @@ public class AuthService {
         HttpServletRequest request, 
         HttpServletResponse response
     ) {
-        String accountKey = email.trim().toLowerCase(Locale.ROOT);
+        String accountKey = emailNormalizer.normalize(email);
 
         String ipAddress = request.getRemoteAddr();
 
@@ -181,7 +186,7 @@ public class AuthService {
 
         loginRateLimitService.checkAccount(accountKey);
 
-        Optional<User> user = userRepository.findByEmail(email);
+        Optional<User> user = userRepository.findByEmail(accountKey);
 
         if (
             user.isEmpty()

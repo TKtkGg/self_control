@@ -54,7 +54,7 @@ public class ScheduleController {
         @PathVariable @Min(0) @Max(6) int dayOfWeek,
         @Valid @RequestBody UpdateScheduleRequest request
     ) {
-        scheduleService.updateTitle(dayOfWeek, request.title());
+        scheduleService.updateTitle(dayOfWeek, request.title(), request.expectedVersion());
         return ResponseEntity.ok(Map.of("message", "Schedule updated successfully"));
     }
 }

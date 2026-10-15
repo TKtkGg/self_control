@@ -67,14 +67,14 @@ public class UserScheduleService {
             List<Task> tasks = taskRepository.findByScheduleIdOrderByStartTimeAsc(schedule.getId());
             int dayOfWeek = schedule.getDayOfWeek().ordinal();
             if (tasks.isEmpty()) {
-                dayScheduleResponses.add(new DayScheduleResponse(dayOfWeek, schedule.getTitle(), List.of()));
+                dayScheduleResponses.add(new DayScheduleResponse(dayOfWeek, schedule.getTitle(), List.of(), schedule.getVersion()));
                 continue;
             }
             List<TaskResponse> taskResponses = tasks.stream()
-                .map(task -> new TaskResponse(task.getId(), task.getName(), task.getStartTime(), task.getEndTime()))
+                .map(task -> new TaskResponse(task.getId(), task.getName(), task.getStartTime(), task.getEndTime(), task.getVersion()))
                 .collect(Collectors.toList());
                 
-            dayScheduleResponses.add(new DayScheduleResponse(dayOfWeek, schedule.getTitle(), taskResponses));
+            dayScheduleResponses.add(new DayScheduleResponse(dayOfWeek, schedule.getTitle(), taskResponses, schedule.getVersion()));
         }
 
         return new UserScheduleResponse(dayScheduleResponses);
@@ -92,13 +92,14 @@ public class UserScheduleService {
         List<Task> tasks = taskRepository.findByScheduleIdOrderByStartTimeAsc(schedule.getId());
 
         List<TaskResponse> taskResponses = tasks.stream()
-                .map(task -> new TaskResponse(task.getId(), task.getName(), task.getStartTime(), task.getEndTime()))
+                .map(task -> new TaskResponse(task.getId(), task.getName(), task.getStartTime(), task.getEndTime(), task.getVersion()))
                 .collect(Collectors.toList());
 
         return new DayScheduleResponse(
             dayOfWeek,
             schedule.getTitle(),
-            taskResponses
+            taskResponses,
+            schedule.getVersion()
         );
     }
 

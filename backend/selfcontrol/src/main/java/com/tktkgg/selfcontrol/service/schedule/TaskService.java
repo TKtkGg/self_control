@@ -3,6 +3,7 @@ package com.tktkgg.selfcontrol.service.schedule;
 import java.time.LocalTime;
 import java.time.DayOfWeek;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -10,6 +11,9 @@ import org.springframework.stereotype.Service;
 import com.tktkgg.selfcontrol.entity.Task;
 import com.tktkgg.selfcontrol.repository.TaskRepository;
 import com.tktkgg.selfcontrol.service.auth.AuthService;
+
+import jakarta.transaction.Transactional;
+
 import com.tktkgg.selfcontrol.repository.ScheduleRepository;
 import com.tktkgg.selfcontrol.entity.Schedule;
 import com.tktkgg.selfcontrol.exception.ApiException;
@@ -77,12 +81,20 @@ public class TaskService  {
         taskRepository.save(task);
     }
 
-    public void updateTask(UUID taskId, int startHour, int startMinute, int endHour, int endMinute, String name) {
+    @Transactional 
+    public void updateTask(UUID taskId, int startHour, int startMinute, int endHour, int endMinute, String name, Long expectedVersion) {
         Task task = taskRepository.findById(taskId).orElseThrow(() -> 
             ApiException.notFound("TASK_NOT_FOUND", "Task not found.")
         );
 
         requireTaskOwner(task);
+
+        if (!Objects.equals(task.getVersion(), expectedVersion)) {
+            throw ApiException.conflict(
+                "RESOURCE_VERSION_CONFLICT",
+                "This task was changed. Reload it before updating."
+            );
+        }
 
         LocalTime startTime = toLocalTime(startHour, startMinute);
         LocalTime endTime = toLocalTime(endHour, endMinute);

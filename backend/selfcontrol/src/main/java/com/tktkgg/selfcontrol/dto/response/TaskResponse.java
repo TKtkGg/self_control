@@ -7,6 +7,7 @@ public record TaskResponse(
     UUID id, 
     String name, 
     LocalTime startTime, 
-    LocalTime endTime
+    LocalTime endTime,
+    Long version
 ) {}
 

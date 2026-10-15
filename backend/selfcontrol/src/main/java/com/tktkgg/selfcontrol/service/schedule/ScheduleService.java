@@ -2,9 +2,13 @@ package com.tktkgg.selfcontrol.service.schedule;
 
 import com.tktkgg.selfcontrol.repository.ScheduleRepository;
 import com.tktkgg.selfcontrol.service.auth.AuthService;
+
+import jakarta.transaction.Transactional;
+
 import com.tktkgg.selfcontrol.entity.Schedule;
 
 import java.time.DayOfWeek;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import com.tktkgg.selfcontrol.exception.ApiException;
@@ -19,12 +23,20 @@ public class ScheduleService {
         this.authService = authService;
     }
 
-    public void updateTitle(int dayOfWeek, String title) {
+    @Transactional 
+    public void updateTitle(int dayOfWeek, String title, Long expectedVersion) {
         Schedule schedule = scheduleRepository.findByUserIdAndDayOfWeek(
             authService.getCurrentUserId(), toDayOfWeek(dayOfWeek)
         ).orElseThrow(() -> 
             ApiException.notFound("SCHEDULE_NOT_FOUND", "Schedule not found.")
         );
+
+        if (!Objects.equals(schedule.getVersion(), expectedVersion)) {
+            throw ApiException.conflict(
+                "RESOURCE_VERSION_CONFLICT",
+                "This schedule was changed. Reload it before updating."
+            );
+        }
 
         if (title == null || title.length() > 30) {
             throw ApiException.badRequest(

@@ -4,15 +4,17 @@ import org.springframework.stereotype.Service;
 
 import com.tktkgg.selfcontrol.repository.UserRepository;
 import com.tktkgg.selfcontrol.service.auth.AuthService;
+
+import jakarta.transaction.Transactional;
+
 import com.tktkgg.selfcontrol.repository.ProfileRepository;
-import com.tktkgg.selfcontrol.repository.SettingRepository;
 import com.tktkgg.selfcontrol.entity.Profile;
-import com.tktkgg.selfcontrol.entity.Setting;
 import com.tktkgg.selfcontrol.entity.User;
 import com.tktkgg.selfcontrol.dto.request.UpdateProfileRequest;
 import com.tktkgg.selfcontrol.dto.response.ProfileResponse;
 import com.tktkgg.selfcontrol.repository.LikeRepository;
 
+import java.util.Objects;
 import java.util.UUID;
 import com.tktkgg.selfcontrol.exception.ApiException;
 
@@ -49,6 +51,7 @@ public class ProfileService {
         return getProfile(targetUserId);
     }
 
+    @Transactional 
     public ProfileResponse updateMyProfile(UpdateProfileRequest request) {
         UUID currentUserId = authService.getCurrentUserId();
 
@@ -56,16 +59,30 @@ public class ProfileService {
             ApiException.notFound("USER_NOT_FOUND", "User not found.")
         );
 
+        if (!Objects.equals(user.getVersion(), request.expectedUserVersion())) {
+            throw ApiException.conflict(
+                "RESOURCE_VERSION_CONFLICT",
+                "This user was changed. Reload it before updating."
+            );
+        }
+
         Profile profile = profileRepository.findByUserId(currentUserId).orElseThrow(() -> 
             ApiException.internalServerError("PROFILE_NOT_FOUND", "Profile is missing.")
         );
+
+        if (!Objects.equals(profile.getVersion(), request.expectedProfileVersion())) {
+            throw ApiException.conflict(
+                "RESOURCE_VERSION_CONFLICT",
+                "This profile was changed. Reload it before updating."
+            );
+        }
 
         user.setUsername(request.username());
         profile.setIcon(request.icon());
         profile.setSelfIntroduce(request.selfIntroduce());
 
         userRepository.save(user);
-        profileRepository.save(profile);
+        profileRepository.saveAndFlush(profile);
 
         return new ProfileResponse(
             currentUserId,
@@ -73,7 +90,9 @@ public class ProfileService {
             profile.getIcon(), 
             profile.getSelfIntroduce(), 
             likeRepository.countByTargetUserId(currentUserId),
-            null
+            null,
+            user.getVersion(),
+            profile.getVersion()
         );
     }
 
@@ -96,7 +115,9 @@ public class ProfileService {
             profile.getIcon(), 
             profile.getSelfIntroduce(), 
             likeRepository.countByTargetUserId(userId),
-            isLiked
+            isLiked,
+            user.getVersion(),
+            profile.getVersion()
         );
     }
 

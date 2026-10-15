@@ -6,5 +6,8 @@ import jakarta.validation.constraints.Size;
 public record UpdateScheduleRequest(
     @NotNull
     @Size(max = 30)
-    String title
+    String title,
+
+    @NotNull 
+    Long expectedVersion
 ) {}

@@ -29,5 +29,8 @@ public record UpdateTaskRequest(
 
     @NotBlank
     @Size(max = 30)
-    String name
+    String name,
+
+    @NotNull 
+    Long expectedVersion
 ) {}

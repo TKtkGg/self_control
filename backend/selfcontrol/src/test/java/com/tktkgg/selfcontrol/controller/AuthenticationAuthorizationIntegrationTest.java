@@ -175,7 +175,7 @@ class AuthenticationAuthorizationIntegrationTest {
                 .session(attackerSession)
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(updateTaskJson("changed-by-attacker"))
+                .content(updateTaskJson("changed-by-attacker", task.getVersion()))
         )
             .andExpect(status().isForbidden())
             .andExpect(jsonPath("$.code").value("TASK_ACCESS_DENIED"));
@@ -203,7 +203,7 @@ class AuthenticationAuthorizationIntegrationTest {
                 .session(ownerSession)
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(updateTaskJson("updated-task"))
+                .content(updateTaskJson("updated-task", task.getVersion()))
         )
             .andExpect(status().isOk());
 
@@ -303,10 +303,11 @@ class AuthenticationAuthorizationIntegrationTest {
             + "\",\"icon\":null,\"selfIntroduce\":\"Updated profile\"}";
     }
 
-    private String updateTaskJson(String name) {
+    private String updateTaskJson(String name, Long expectedVersion) {
         return "{\"startHour\":10,\"startMinute\":0"
             + ",\"endHour\":11,\"endMinute\":0"
-            + ",\"name\":\"" + name + "\"}";
+            + ",\"name\":\"" + name + "\""
+            + ",\"expectedVersion\":" + expectedVersion + "}";
     }
 
     private RequestPostProcessor remoteAddress() {

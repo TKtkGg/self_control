@@ -200,9 +200,9 @@ public class AuthService {
             );
         }
 
-        establishSession(user.get(), request, response);
-
         loginRateLimitService.resetAccount(accountKey);
+
+        establishSession(user.get(), request, response);
     }
 
     public void logout(HttpServletRequest request, HttpServletResponse response) {

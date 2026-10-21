@@ -6,18 +6,25 @@ import { apiGet, apiPatch } from "@/lib/apiClient";
 export default function SettingPage() {
     const [isPublic, setIsPublic] = useState(false);
     const [isAuthorizeNotification, setIsAuthorizeNotification] = useState(false);
+    const [version, setVersion] = useState<number>();
 
     useEffect(() => {
-        apiGet("/api/settings").then((res) => {
-            setIsPublic(res.isPublic);
-            setIsAuthorizeNotification(res.isAuthorizeNotification);
+        apiGet("/api/settings").then((data) => {
+            setIsPublic(data.isPublic);
+            setIsAuthorizeNotification(data.isAuthorizeNotification);
+            setVersion(data.version)
         });
     }, [])
 
     const handleSubmit = () => {
-        apiPatch("/api/settings", { isPublic, isAuthorizeNotification }).then((res) => {
-            setIsPublic(res.isPublic);
-            setIsAuthorizeNotification(res.isAuthorizeNotification);
+        if (version === undefined) {
+            throw new Error("通信に失敗しました。");
+        }
+        
+        apiPatch("/api/settings", { isPublic, isAuthorizeNotification, expectedVersion: version }).then((data) => {
+            setIsPublic(data.isPublic);
+            setIsAuthorizeNotification(data.isAuthorizeNotification);
+            setVersion(data.version)
         });
     };
 

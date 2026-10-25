@@ -36,7 +36,8 @@ public class AlarmService {
             task.getId(),
             task.getName(),
             task.getStartTime(),
-            task.getEndTime()
+            task.getEndTime(),
+            task.getVersion()
         );
 
         return new AlarmResponse(

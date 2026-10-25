@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 import org.hibernate.annotations.OnDelete;
@@ -43,6 +44,9 @@ public class Task {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @Version 
+    private Long version;
     
     @PrePersist
     void onCreate() {
@@ -76,6 +80,10 @@ public class Task {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public Long getVersion() {
+        return this.version;
     }
 
     public void setId(UUID id) {

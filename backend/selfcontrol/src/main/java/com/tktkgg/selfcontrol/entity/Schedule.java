@@ -5,6 +5,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Version;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -49,6 +50,9 @@ public class Schedule {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Version 
+    private Long version;
+
     @PrePersist
     void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -72,6 +76,10 @@ public class Schedule {
 
     public LocalDateTime getCreatedAt() {
         return this.createdAt;
+    }
+
+    public Long getVersion() {
+        return this.version;
     }
 
     public void setId(UUID id) {

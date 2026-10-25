@@ -3,10 +3,12 @@ export type Task = {
     name: string;
     startTime: string;
     endTime: string;
+    version: number;
 }
 
 export type DaySchedule = {
     dayOfWeek: number;
     title: string;
     tasks: Task[];
+    version: number;
 }

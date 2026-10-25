@@ -3,6 +3,7 @@ package com.tktkgg.selfcontrol.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,6 +34,9 @@ public class Profile {
     @Column(name = "self_introduce", length = 500)
     private String selfIntroduce;
 
+    @Version
+    private Long version;
+
     public UUID getId() {
         return this.id;
     }
@@ -47,6 +51,10 @@ public class Profile {
 
     public String getSelfIntroduce() {
         return this.selfIntroduce;
+    }
+
+    public Long getVersion() {
+        return this.version;
     }
 
     public void setId(UUID id) {

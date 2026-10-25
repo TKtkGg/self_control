@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -32,6 +33,9 @@ public class User {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Version 
+    private Long version;
+
     @PrePersist
     void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -55,6 +59,10 @@ public class User {
     
     public LocalDateTime getCreatedAt() {
         return this.createdAt;
+    }
+
+    public Long getVersion() {
+        return this.version;
     }
 
     public void setId(UUID id) {

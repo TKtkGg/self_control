@@ -6,6 +6,7 @@ import { toDayLabel } from "@/lib/dayOfWeek";
 import { useRouter } from "next/navigation";
 import { DaySchedule } from "@/types/schedule";
 import { Task } from "@/types/schedule";
+import { useAlarmRefresh } from "@/components/AlarmProvider";
 
 export default function SchedulePage() {
     const [days, setDays] = useState<DaySchedule[]>([]);
@@ -19,6 +20,7 @@ export default function SchedulePage() {
     const [openCreateModal, setOpenCreateModal] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
     const router = useRouter();
+    const { refreshAlarm } = useAlarmRefresh();
 
     useEffect(() => {
         apiGet("/api/schedules").then((data) => {
@@ -94,6 +96,9 @@ export default function SchedulePage() {
             endHour: end.hour,
             endMinute: end.minute,
         })
+        .then(() => {
+            refreshAlarm();
+        })
         .catch((error) => setError(error.message))
         .finally(() => refreshHome());
     }
@@ -118,6 +123,9 @@ export default function SchedulePage() {
             endMinute: end.minute,
             expectedVersion: version,
         })
+        .then(() => {
+            refreshAlarm();
+        })
         .catch((error) => setError(error.message))
         .finally(() => refreshHome());
     }
@@ -126,6 +134,9 @@ export default function SchedulePage() {
         setOpenUpdateModal(false);
         setId(id);
         apiDelete(`/api/tasks/${id}`)
+        .then(() => {
+            refreshAlarm();
+        })
         .catch((error) => setError(error.message))
         .finally(() => refreshHome());
     }

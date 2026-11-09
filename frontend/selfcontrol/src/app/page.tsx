@@ -3,12 +3,14 @@
 import { useRouter } from "next/navigation";
 import { apiAuthPost, apiGet } from "@/lib/apiClient";
 import { useState, useEffect } from "react";
+import { useAlarmRefresh } from "@/components/AlarmProvider";
 
 export default function HomePage() {
   const router = useRouter();
   const [authenticated, setAuthenticated] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const { refreshAlarm } = useAlarmRefresh();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -25,6 +27,7 @@ export default function HomePage() {
   const handleLogout = async () => {
     try {
       await apiAuthPost("/api/auth/logout");
+      refreshAlarm();
       setSuccess("ログアウトに成功しました");
       setAuthenticated(false);
     } catch (error: unknown) {

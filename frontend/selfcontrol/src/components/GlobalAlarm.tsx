@@ -2,33 +2,50 @@
 
 import { apiGet } from "@/lib/apiClient"
 import { Task } from "@/types/schedule"
+import { useAlarmRefresh } from "@/components/AlarmProvider"
 import { useEffect, useState } from "react"
 
 export default function GlobalAlarm() {
     const [task, setTask] = useState<Task | null>(null);
     const [nextStartAt, setNextStartAt] = useState<string | null>(null);
     const [isStart, setIsStart] = useState<boolean>(false);
+    const { refreshKey } = useAlarmRefresh();
 
     useEffect(() => {
+        let cancelled = false;
+
         const checkAlarm = async () => {
             try {
                 const auth = await apiGet("/api/auth/status");
+
+                if (cancelled) return;
     
                 if (!auth.authenticated) {
+                    setTask(null);
+                    setNextStartAt(null);
+                    setIsStart(false);
                     return;
                 }
     
                 const data = await apiGet("/api/alarm/next");
+
+                if (cancelled) return
     
                 setTask(data.task);
                 setNextStartAt(data.nextStartAt);
             } catch (error) {
-                console.error(error);
+                if (!cancelled) {
+                    console.error(error);
+                }
             }
         };
     
-        checkAlarm();
-    }, []);
+        void checkAlarm();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [refreshKey]);
 
     const refreshNextTask = async () => {
         const data = await apiGet("/api/alarm/next");

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { apiAuthPost } from "@/lib/apiClient";
+import { useAlarmRefresh } from "@/components/AlarmProvider";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -10,6 +11,7 @@ export default function LoginPage() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const router = useRouter();
+    const { refreshAlarm } = useAlarmRefresh();
 
     const handleSubmit = async () => {
         try {
@@ -18,6 +20,7 @@ export default function LoginPage() {
                 password,
             });
             setSuccess("ログインに成功しました");
+            refreshAlarm();
             router.push("/home");
         } catch (error: unknown) {
             if(error instanceof Error) {

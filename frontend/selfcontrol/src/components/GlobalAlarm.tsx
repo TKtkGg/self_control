@@ -3,12 +3,12 @@
 import { apiGet } from "@/lib/apiClient"
 import { Task } from "@/types/schedule"
 import { useAlarmRefresh } from "@/components/AlarmProvider"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 export default function GlobalAlarm() {
     const [task, setTask] = useState<Task | null>(null);
     const [nextStartAt, setNextStartAt] = useState<string | null>(null);
-    const [isStart, setIsStart] = useState<boolean>(false);
+    const [notificationTask, setNotificationTask] = useState<Task | null>(null);
     const { refreshKey } = useAlarmRefresh();
 
     useEffect(() => {
@@ -23,7 +23,7 @@ export default function GlobalAlarm() {
                 if (!auth.authenticated) {
                     setTask(null);
                     setNextStartAt(null);
-                    setIsStart(false);
+                    setNotificationTask(null);
                     return;
                 }
     
@@ -47,13 +47,12 @@ export default function GlobalAlarm() {
         };
     }, [refreshKey]);
 
-    const refreshNextTask = async () => {
+    const refreshNextTask = useCallback(async () => {
         const data = await apiGet("/api/alarm/next");
     
         setTask(data.task);
         setNextStartAt(data.nextStartAt);
-        setIsStart(false);
-    }
+    }, [])
 
     useEffect(() => {
         if (!task || !nextStartAt) return;
@@ -62,23 +61,35 @@ export default function GlobalAlarm() {
         const delay = target.getTime() - Date.now();
     
         if (Number.isNaN(delay)) return;
-    
+
         const timerId = window.setTimeout(() => {
-            setIsStart(true);
-            refreshNextTask();
+            setNotificationTask(task);
+            void refreshNextTask().catch((error) => console.error(error));
         }, Math.max(0, delay));
     
         return () => {
             window.clearTimeout(timerId);
         };
-    }, [task, nextStartAt]);
+    }, [task, nextStartAt, refreshNextTask]);
+
+    useEffect(() => {
+        if (!notificationTask) return;
+    
+        const timerId = window.setTimeout(() => {
+            setNotificationTask(null);
+        }, 5000);
+    
+        return () => {
+            window.clearTimeout(timerId);
+        };
+    }, [notificationTask]);
 
 
     return(
         <div>
-            {task && isStart && (
+            {notificationTask && (
                 <div className="fixed top-0 left-0 right-0 z-50 bg-green-500">
-                    タスクの開始時間です
+                    タスク「{notificationTask.name}」の開始時間です
                 </div>
             )}
         </div>   

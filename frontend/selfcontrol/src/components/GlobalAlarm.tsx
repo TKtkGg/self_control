@@ -9,11 +9,13 @@ export default function GlobalAlarm() {
     const [task, setTask] = useState<Task | null>(null);
     const [nextStartAt, setNextStartAt] = useState<string | null>(null);
     const [notificationTask, setNotificationTask] = useState<Task | null>(null);
+    const [isAuthorizeNotification, setIsAuthorizeNotification] = useState(false);
+    const [error, setError] = useState<string | null>("");
     const { refreshKey } = useAlarmRefresh();
 
     useEffect(() => {
         let cancelled = false;
-
+        
         const checkAlarm = async () => {
             try {
                 const auth = await apiGet("/api/auth/status");
@@ -24,18 +26,24 @@ export default function GlobalAlarm() {
                     setTask(null);
                     setNextStartAt(null);
                     setNotificationTask(null);
+                    setIsAuthorizeNotification(false);
                     return;
                 }
     
-                const data = await apiGet("/api/alarm/next");
+                const [alarmData, settingData] = await Promise.all([
+                    apiGet("/api/alarm/next"),
+                    apiGet("/api/settings"),
+                ]);
 
                 if (cancelled) return
     
-                setTask(data.task);
-                setNextStartAt(data.nextStartAt);
+                setTask(alarmData.task);
+                setNextStartAt(alarmData.nextStartAt);
+                setIsAuthorizeNotification(settingData.isAuthorizeNotification);
             } catch (error) {
                 if (!cancelled) {
                     console.error(error);
+                    setIsAuthorizeNotification(false);
                 }
             }
         };
@@ -63,14 +71,26 @@ export default function GlobalAlarm() {
         if (Number.isNaN(delay)) return;
 
         const timerId = window.setTimeout(() => {
-            setNotificationTask(task);
+            if (isAuthorizeNotification) {
+                setNotificationTask(task);
+    
+                if ("Notification" in window && Notification.permission === "granted") {
+                    try{
+                        new Notification("タスクの開始時間です", {
+                            body: task.name,
+                        });
+                    } catch {
+                        setError("通知に失敗しました。");
+                    }       
+                }
+            }
             void refreshNextTask().catch((error) => console.error(error));
         }, Math.max(0, delay));
     
         return () => {
             window.clearTimeout(timerId);
         };
-    }, [task, nextStartAt, refreshNextTask]);
+    }, [task, nextStartAt, refreshNextTask, isAuthorizeNotification]);
 
     useEffect(() => {
         if (!notificationTask) return;
@@ -92,6 +112,7 @@ export default function GlobalAlarm() {
                     タスク「{notificationTask.name}」の開始時間です
                 </div>
             )}
+            {error && <p>{error}</p>}
         </div>   
     )
 }

@@ -5,8 +5,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.stereotype.Service;
 
@@ -14,6 +12,9 @@ import com.tktkgg.selfcontrol.exception.RateLimitExceededException;
 
 @Service 
 public class LoginRateLimitService {
+    private static final String IP_KEY_PREFIX = "self-control:login-rate-limit-ip:";
+    private static final String ACCOUNT_KEY_PREFIX = "self-control:login-rate-limit:account:";
+
     private static final RateLimitPolicy IP_POLICY = new RateLimitPolicy(
         15,
         Duration.ofMinutes(1),
@@ -39,43 +40,50 @@ public class LoginRateLimitService {
 
     private final Clock clock;
 
-    private final ConcurrentMap<String, RateLimitState> states = 
-        new ConcurrentHashMap<>();
+    private final RedisLoginRateLimitStore redisStore;
 
-    public LoginRateLimitService(Clock clock) {
+    public LoginRateLimitService(Clock clock, RedisLoginRateLimitStore redisStore) {
         this.clock = clock;
+        this.redisStore = redisStore;
     }
 
     public void checkIp(String ipAddress) {
-        String key = "ip:" + ipAddress;
+        String redisKey = IP_KEY_PREFIX + ipAddress;
 
-        Optional<Instant> blockedUntil = getState(key)
-            .consume(IP_POLICY, clock.instant());
+        Optional<Instant> blockedUntil = redisStore.consumeIp(
+            redisKey,
+            IP_POLICY,
+            clock.instant()
+        );
         
         rejectIfBlocked(blockedUntil);
     }
 
     public void checkAccount(String accountKey) {
-        String key = "account:" + accountKey;
+        String redisKey = ACCOUNT_KEY_PREFIX + accountKey;
 
-        Optional<Instant> blockedUntil = getState(key)
-            .checkBlocked(ACCOUNT_POLICY, clock.instant());
+        Optional<Instant> blockedUntil = redisStore.checkAccount(
+            redisKey, 
+            ACCOUNT_POLICY,
+            clock.instant()
+        );
         
         rejectIfBlocked(blockedUntil);
     }
 
     public void recordAccountFailure(String accountKey) {
-        String key = "account:" + accountKey;
+        String redisKey = ACCOUNT_KEY_PREFIX + accountKey;
 
-        getState(key).recordFailure(ACCOUNT_POLICY, clock.instant());
+        redisStore.recordAccountFailure(
+            redisKey,
+            ACCOUNT_POLICY,
+            clock.instant()
+        );
     }
 
     public void resetAccount(String accountKey) {
-        states.remove("account:" + accountKey);
-    }
-
-    private RateLimitState getState(String key) {
-        return states.computeIfAbsent(key, ignored -> new RateLimitState());
+        String redisKey = ACCOUNT_KEY_PREFIX + accountKey;
+        redisStore.resetAccount(redisKey);
     }
 
     private void rejectIfBlocked(Optional<Instant> blockedUntil) {
@@ -85,10 +93,7 @@ public class LoginRateLimitService {
 
         long retryAfterSeconds = Math.max(
             1, 
-            Duration.between(
-                clock.instant(), 
-                blockedUntil.get()
-            ).toSeconds()
+            Duration.between(clock.instant(), blockedUntil.get()).toSeconds()
         );
 
         throw new RateLimitExceededException(retryAfterSeconds);

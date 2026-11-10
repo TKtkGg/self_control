@@ -71,7 +71,9 @@ public class UserService {
         return new UsersResponse(userResponses, page, size, users.hasNext());
     }
 
-    public LikeCountResponse likeUser(UUID currentUserId, UUID targetUserId) {
+    public LikeCountResponse likeUser(UUID targetUserId) {
+        UUID currentUserId = authService.getCurrentUserId();
+
         Optional<Like> existingLike = likeRepository.findByUserIdAndTargetUserId(currentUserId, targetUserId);
         if (existingLike.isPresent()) {
             throw ApiException.badRequest("ALREADY_LIKED", "The user is already liked.");
@@ -97,7 +99,9 @@ public class UserService {
         return new LikeCountResponse(likeRepository.countByTargetUserId(targetUserId), true);
     }
 
-    public LikeCountResponse unlikeUser(UUID currentUserId, UUID targetUserId) {
+    public LikeCountResponse unlikeUser(UUID targetUserId) {
+        UUID currentUserId = authService.getCurrentUserId();
+        
         Optional<Like> existingLike = likeRepository.findByUserIdAndTargetUserId(currentUserId, targetUserId);
         if (!existingLike.isPresent()) {
             throw ApiException.badRequest("LIKE_NOT_FOUND", "The user has not been liked.");

@@ -1,5 +1,6 @@
 package com.tktkgg.selfcontrol.service.user;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -8,6 +9,9 @@ import com.tktkgg.selfcontrol.dto.request.SettingRequest;
 import com.tktkgg.selfcontrol.dto.response.SettingResponse;
 import com.tktkgg.selfcontrol.repository.SettingRepository;
 import com.tktkgg.selfcontrol.service.auth.AuthService;
+
+import jakarta.transaction.Transactional;
+
 import com.tktkgg.selfcontrol.entity.Setting;
 import com.tktkgg.selfcontrol.exception.ApiException;
 
@@ -28,9 +32,10 @@ public class SettingService {
                 "SETTING_NOT_FOUND",
                 "Setting is missing."
             ));
-        return new SettingResponse(setting.getIsPublic(), setting.getIsAuthorizeNotification());
+        return new SettingResponse(setting.getIsPublic(), setting.getIsAuthorizeNotification(), setting.getVersion());
     }
 
+    @Transactional 
     public SettingResponse updateSetting(SettingRequest request) {
         UUID userId = authService.getCurrentUserId();
         Setting setting = settingRepository.findByUserId(userId)
@@ -38,11 +43,18 @@ public class SettingService {
                 "SETTING_NOT_FOUND",
                 "Setting is missing."
             ));
+        
+        if (!Objects.equals(setting.getVersion(), request.expectedVersion())) {
+            throw ApiException.conflict(
+                "RESOURCE_VERSION_CONFLICT",
+                "This setting was changed. Reload it before updating."
+            );
+        }
 
         setting.setIsPublic(request.isPublic());
         setting.setIsAuthorizeNotification(request.isAuthorizeNotification());
-        settingRepository.save(setting);
+        settingRepository.saveAndFlush(setting);
 
-        return new SettingResponse(setting.getIsPublic(), setting.getIsAuthorizeNotification());
+        return new SettingResponse(setting.getIsPublic(), setting.getIsAuthorizeNotification(), setting.getVersion());
     }
 }

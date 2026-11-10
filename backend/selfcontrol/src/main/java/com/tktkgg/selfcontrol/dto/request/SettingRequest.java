@@ -7,5 +7,8 @@ public record SettingRequest(
     Boolean isPublic,
 
     @NotNull
-    Boolean isAuthorizeNotification
+    Boolean isAuthorizeNotification,
+
+    @NotNull
+    Long expectedVersion
 ) {}

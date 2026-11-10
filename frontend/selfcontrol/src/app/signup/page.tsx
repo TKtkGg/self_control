@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { apiAuthPost } from "@/lib/apiClient";
+import { useAlarmRefresh } from "@/components/AlarmProvider";
 import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
@@ -12,6 +13,7 @@ export default function SignUpPage() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const router = useRouter();
+    const { refreshAlarm } = useAlarmRefresh();
 
     const handleSubmit = async () => {
         try {
@@ -22,6 +24,7 @@ export default function SignUpPage() {
                 passwordConfirm,
             });
             setSuccess("ユーザー登録に成功しました");
+            refreshAlarm();
             router.push("/home");
         } catch (error: unknown) {
             if(error instanceof Error) {

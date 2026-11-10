@@ -8,6 +8,8 @@ export default function ProfilePage() {
     const [selfIntroduce, setSelfIntroduce] = useState<string>("");
     const [icon, setIcon] = useState<string>("");
     const [iconSrc, setIconSrc] = useState<string | undefined>(undefined);
+    const [profileVersion, setProfileVersion] = useState<number>();
+    const [userVersion, setUserVersion] = useState<number>();
 
     useEffect(() => {
         apiGet(`/api/profile`).then((data) => {
@@ -16,16 +18,30 @@ export default function ProfilePage() {
             setIcon(data.icon ?? "");
             const src = data.icon ? `data:image/jpeg;base64,${data.icon}` : undefined;
             setIconSrc(src);
+            setProfileVersion(data.profileVersion);
+            setUserVersion(data.userVersion);
         });
     }, []);
 
     const handleUpdate = () => {
-        apiPatch(`/api/profile`, { username, selfIntroduce, icon }).then((data) => {
+        if (profileVersion === undefined || userVersion === undefined) {
+            throw new Error("通信に失敗しました。");
+        }
+
+        apiPatch(`/api/profile`, { 
+            username, 
+            selfIntroduce, 
+            icon, 
+            expectedProfileVersion: profileVersion, 
+            expectedUserVersion: userVersion 
+        }).then((data) => {
             setUsername(data.username);
             setSelfIntroduce(data.selfIntroduce);
             setIcon(data.icon ?? "");
             const src = data.icon ? `data:image/jpeg;base64,${data.icon}` : undefined;
             setIconSrc(src);
+            setProfileVersion(data.profileVersion);
+            setUserVersion(data.userVersion);
         });
     }
 

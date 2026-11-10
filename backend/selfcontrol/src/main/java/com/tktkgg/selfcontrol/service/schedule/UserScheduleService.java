@@ -6,6 +6,7 @@ import com.tktkgg.selfcontrol.repository.ScheduleRepository;
 import com.tktkgg.selfcontrol.repository.SettingRepository;
 import com.tktkgg.selfcontrol.repository.TaskRepository;
 import com.tktkgg.selfcontrol.service.auth.AuthService;
+import com.tktkgg.selfcontrol.service.user.UserAccessService;
 import com.tktkgg.selfcontrol.dto.response.UserScheduleResponse;
 import com.tktkgg.selfcontrol.entity.Schedule;
 import com.tktkgg.selfcontrol.entity.Setting;
@@ -26,27 +27,34 @@ public class UserScheduleService {
     private final TaskRepository taskRepository;
     private final SettingRepository settingRepository;
     private final AuthService authService;
+    private final UserAccessService userAccessService;
 
     public UserScheduleService(
         ScheduleRepository scheduleRepository, 
         TaskRepository taskRepository,
         SettingRepository settingRepository,
-        AuthService authService
+        AuthService authService,
+        UserAccessService userAccessService
     ) {
         this.scheduleRepository = scheduleRepository;
         this.taskRepository = taskRepository;
         this.settingRepository = settingRepository;
         this.authService = authService;
+        this.userAccessService = userAccessService;
     }
 
-    public UserScheduleResponse getUserSchedule(UUID userId) {
-        Setting setting = settingRepository.findByUserId(userId).orElseThrow(() -> 
-            ApiException.notFound("SETTING_NOT_FOUND", "Setting is missing")
-        );
+    public UserScheduleResponse getMySchedule() {
+        UUID currentUserId = authService.getCurrentUserId();
 
-        if (!userId.equals(authService.getCurrentUserId()) && setting.getIsPublic() == false) {
-            throw ApiException.forbidden("USER_FORBIDDEN", "CurrentUser is forbidden");
-        }
+        return getUserSchedule(currentUserId);
+    }
+
+    public UserScheduleResponse getOtherUserSchedule(UUID userId) {
+        return getUserSchedule(userId);
+    }
+
+    private UserScheduleResponse getUserSchedule(UUID userId) {
+        userAccessService.requireCanViewUser(userId);
         
         List<Schedule> schedules = scheduleRepository.findByUserIdOrderByDayOfWeekAsc(userId);
         if (schedules.isEmpty()) {
@@ -59,22 +67,24 @@ public class UserScheduleService {
             List<Task> tasks = taskRepository.findByScheduleIdOrderByStartTimeAsc(schedule.getId());
             int dayOfWeek = schedule.getDayOfWeek().ordinal();
             if (tasks.isEmpty()) {
-                dayScheduleResponses.add(new DayScheduleResponse(dayOfWeek, schedule.getTitle(), List.of()));
+                dayScheduleResponses.add(new DayScheduleResponse(dayOfWeek, schedule.getTitle(), List.of(), schedule.getVersion()));
                 continue;
             }
             List<TaskResponse> taskResponses = tasks.stream()
-                .map(task -> new TaskResponse(task.getId(), task.getName(), task.getStartTime(), task.getEndTime()))
+                .map(task -> new TaskResponse(task.getId(), task.getName(), task.getStartTime(), task.getEndTime(), task.getVersion()))
                 .collect(Collectors.toList());
                 
-            dayScheduleResponses.add(new DayScheduleResponse(dayOfWeek, schedule.getTitle(), taskResponses));
+            dayScheduleResponses.add(new DayScheduleResponse(dayOfWeek, schedule.getTitle(), taskResponses, schedule.getVersion()));
         }
 
         return new UserScheduleResponse(dayScheduleResponses);
     }
 
-    public DayScheduleResponse getUserSpecificSchedule(UUID userID, int dayOfWeek) {
+    public DayScheduleResponse getUserSpecificSchedule(int dayOfWeek) {
+        UUID userId = authService.getCurrentUserId();
+
         Schedule schedule = scheduleRepository.findByUserIdAndDayOfWeek(
-            userID, toDayOfWeek(dayOfWeek)
+            userId, toDayOfWeek(dayOfWeek)
         ).orElseThrow(() -> 
             ApiException.notFound("SCHEDULE_NOT_FOUND", "Schedule not found.")
         );
@@ -82,13 +92,14 @@ public class UserScheduleService {
         List<Task> tasks = taskRepository.findByScheduleIdOrderByStartTimeAsc(schedule.getId());
 
         List<TaskResponse> taskResponses = tasks.stream()
-                .map(task -> new TaskResponse(task.getId(), task.getName(), task.getStartTime(), task.getEndTime()))
+                .map(task -> new TaskResponse(task.getId(), task.getName(), task.getStartTime(), task.getEndTime(), task.getVersion()))
                 .collect(Collectors.toList());
 
         return new DayScheduleResponse(
             dayOfWeek,
             schedule.getTitle(),
-            taskResponses
+            taskResponses,
+            schedule.getVersion()
         );
     }
 

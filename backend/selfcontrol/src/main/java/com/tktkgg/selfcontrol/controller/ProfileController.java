@@ -1,35 +1,41 @@
 package com.tktkgg.selfcontrol.controller;
 
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import jakarta.validation.Valid;
 
 import com.tktkgg.selfcontrol.dto.response.ProfileResponse;
 import com.tktkgg.selfcontrol.dto.request.UpdateProfileRequest;
-import com.tktkgg.selfcontrol.service.auth.AuthService;
 import com.tktkgg.selfcontrol.service.user.ProfileService;
 
 @RestController
-@RequestMapping("/api/profile")
+@RequestMapping("/api")
 public class ProfileController {
     private final ProfileService profileService;
-    private final AuthService authService;
 
-    public ProfileController(ProfileService profileService, AuthService authService) {
+    public ProfileController(ProfileService profileService) {
         this.profileService = profileService;
-        this.authService = authService;
     }
 
-    @GetMapping("")
+    @GetMapping("/profile")
     public ProfileResponse getProfile() {
-        return profileService.getProfile(authService.getCurrentUserId());
+        return profileService.getMyProfile();
     }
 
-    @PatchMapping("")
+    @GetMapping("/users/{userId}/profile")
+    public ProfileResponse getProfile(@PathVariable UUID userId) {
+        return profileService.getUserProfile(userId);
+    }
+
+    @PatchMapping("/profile")
     public ProfileResponse updateProfile(@Valid @RequestBody UpdateProfileRequest request) {
-        return profileService.updateProfile(authService.getCurrentUserId(), request);
+        return profileService.updateMyProfile(request);
     }
 }

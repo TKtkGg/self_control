@@ -49,7 +49,8 @@ public class TaskController {
             request.startMinute(), 
             request.endHour(),
             request.endMinute(), 
-            request.name()
+            request.name(),
+            request.expectedVersion()
         );
 
         return ResponseEntity.ok(Map.of("message", "Task updated successfully"));

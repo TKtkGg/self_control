@@ -8,5 +8,7 @@ public record ProfileResponse(
     byte[] icon, 
     String selfIntroduce, 
     int likeCount, 
-    Boolean isLiked
+    Boolean isLiked,
+    Long userVersion,
+    Long profileVersion
 ) {}

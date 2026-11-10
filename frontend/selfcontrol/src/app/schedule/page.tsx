@@ -6,6 +6,7 @@ import { toDayLabel } from "@/lib/dayOfWeek";
 import { useRouter } from "next/navigation";
 import { DaySchedule } from "@/types/schedule";
 import { Task } from "@/types/schedule";
+import { useAlarmRefresh } from "@/components/AlarmProvider";
 
 export default function SchedulePage() {
     const [days, setDays] = useState<DaySchedule[]>([]);
@@ -14,10 +15,12 @@ export default function SchedulePage() {
     const [taskName, setTaskName] = useState<string>("");
     const [startTime, setStartTime] = useState<string>("");
     const [endTime, setEndTime] = useState<string>("");
+    const [taskVersion, setTaskVersion] = useState<number>();
     const [openUpdateModal, setOpenUpdateModal] = useState<boolean>(false);
     const [openCreateModal, setOpenCreateModal] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
     const router = useRouter();
+    const { refreshAlarm } = useAlarmRefresh();
 
     useEffect(() => {
         apiGet("/api/schedules").then((data) => {
@@ -53,6 +56,7 @@ export default function SchedulePage() {
         setTaskName(task.name);
         setStartTime(task.startTime.slice(0, 5));
         setEndTime(task.endTime.slice(0, 5));
+        setTaskVersion(task.version);
     }
 
     const onClickCreate = (dayOfWeek: number) => {
@@ -64,9 +68,15 @@ export default function SchedulePage() {
         setEndTime("00:00");
     }
 
-    const onUpdateTitle = (dayOfWeek: number, title: string) => {
+    const onUpdateTitle = (dayOfWeek: number, title: string, version: number | undefined) => {
+        if (version === undefined) {
+            setError("通信に失敗しました。");
+            return
+        }
+
         apiPatch(`/api/schedules/${dayOfWeek}`, {
             title: title,
+            expectedVersion: version
         })
         .catch((error) => setError(error.message))
         .finally(() => refreshHome());
@@ -86,11 +96,19 @@ export default function SchedulePage() {
             endHour: end.hour,
             endMinute: end.minute,
         })
+        .then(() => {
+            refreshAlarm();
+        })
         .catch((error) => setError(error.message))
         .finally(() => refreshHome());
     }
 
-    const onUpdateTask = (id: string, taskName: string, startTime: string, endTime: string) => {
+    const onUpdateTask = (id: string, taskName: string, startTime: string, endTime: string, version: number | undefined) => {
+        if (version === undefined) {
+            setError("通信に失敗しました。");
+            return;
+        }
+
         setOpenUpdateModal(false);
         setId(id);
 
@@ -103,6 +121,10 @@ export default function SchedulePage() {
             startMinute: start.minute,
             endHour: end.hour,
             endMinute: end.minute,
+            expectedVersion: version,
+        })
+        .then(() => {
+            refreshAlarm();
         })
         .catch((error) => setError(error.message))
         .finally(() => refreshHome());
@@ -112,6 +134,9 @@ export default function SchedulePage() {
         setOpenUpdateModal(false);
         setId(id);
         apiDelete(`/api/tasks/${id}`)
+        .then(() => {
+            refreshAlarm();
+        })
         .catch((error) => setError(error.message))
         .finally(() => refreshHome());
     }
@@ -129,7 +154,7 @@ export default function SchedulePage() {
                             onBlur={(e) => {
                                 const next = e.target.value;
                                 if (next === day.title) return;
-                                onUpdateTitle(day.dayOfWeek, next);
+                                onUpdateTitle(day.dayOfWeek, next, day.version);
                             }}
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
@@ -149,13 +174,13 @@ export default function SchedulePage() {
                 </div>
             ))}
 
-            {openUpdateModal && (
+            {openUpdateModal && taskVersion !== undefined && (
                 <div>
                     <h3>タスク編集</h3>
                     <input type="text" value={taskName} onChange={(e) => setTaskName(e.target.value)} />
                     <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
                     <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
-                    <button onClick={() => onUpdateTask(id, taskName, startTime, endTime)}>更新</button>
+                    <button onClick={() => onUpdateTask(id, taskName, startTime, endTime, taskVersion)}>更新</button>
                     <button onClick={() => onDeleteTask(id)}>削除</button>
                 </div>
             )}

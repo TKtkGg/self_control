@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -181,6 +182,25 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             request
         );
         return toResponse(problemDetail, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    public ResponseEntity<Object> handleOptimisticLockingFailure(
+        OptimisticLockingFailureException exception,
+        HttpServletRequest request
+    ) {
+        ProblemDetail problemDetail = problemDetailFactory.create(
+            HttpStatus.CONFLICT,
+            "RESOURCE_VERSION_CONFLICT",
+            "This resource was changed by another request. Reload it before updating.",
+            request
+        );
+
+        return toResponse(
+            problemDetail,
+            new HttpHeaders(),
+            HttpStatus.CONFLICT
+        );
     }
 
     @ExceptionHandler(Exception.class)
